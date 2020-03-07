@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\DifficultyLevel;
+use App\Entity\Level;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
- * @method DifficultyLevel|null find($id, $lockMode = null, $lockVersion = null)
- * @method DifficultyLevel|null findOneBy(array $criteria, array $orderBy = null)
- * @method DifficultyLevel[]    findAll()
- * @method DifficultyLevel[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Level|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Level|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Level[]    findAll()
+ * @method Level[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class DifficultyLevelRepository extends ServiceEntityRepository
+class LevelRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, DifficultyLevel::class);
+        parent::__construct($registry, Level::class);
     }
 
     // /**
-    //  * @return DifficultyLevel[] Returns an array of DifficultyLevel objects
+    //  * @return Level[] Returns an array of level objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class DifficultyLevelRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?DifficultyLevel
+    public function findOneBySomeField($value): ?Level
     {
         return $this->createQueryBuilder('d')
             ->andWhere('d.exampleField = :val')
