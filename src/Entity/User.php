@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -89,9 +90,16 @@ class User implements UserInterface
 
     /**
      * @var string The hashed password
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $password;
+
+    /**
+     * @Groups({"user:write"})
+     * @SerializedName("password")
+     * @Assert\NotBlank
+     */
+    private $plainPassword;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -128,6 +136,12 @@ class User implements UserInterface
      * @Groups({"user:read", "user:write"})
      */
     private $othernames;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"user:read", "user:write"})
+     */
+    private $photo;
 
     /**
      * @ORM\Column(type="boolean")
@@ -187,13 +201,12 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\Url
      * @Groups({"user:read", "user:write"})
      */
     private $twitterLink;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      * @Assert\Type(
      *  type="bool",
      *  message="The value {{ value  }} is not a valid {{ type }}"
@@ -203,7 +216,7 @@ class User implements UserInterface
     private $isAdmin;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      * @Assert\Type(
      *  type="bool",
      *  message="The value {{ value  }} is not a valid {{ type }}"
@@ -213,7 +226,7 @@ class User implements UserInterface
     private $isModerator;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      * @Assert\Type(
      *  type="bool",
      *  message="The value {{ value  }} is not a valid {{ type }}"
@@ -283,6 +296,7 @@ class User implements UserInterface
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->isActiveActionAt = new \DateTimeImmutable();
         $this->levels = new ArrayCollection();
         $this->questions = new ArrayCollection();
         $this->subjects = new ArrayCollection();
@@ -362,6 +376,18 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(String $plainPassword)
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
     /**
      * @see UserInterface
      */
@@ -376,7 +402,7 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function getFirstname(): ?string
@@ -411,6 +437,18 @@ class User implements UserInterface
     public function setOthernames(?string $othernames): self
     {
         $this->othernames = $othernames;
+
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): self
+    {
+        $this->photo = $photo;
 
         return $this;
     }
@@ -507,7 +545,7 @@ class User implements UserInterface
      */
     public function getUpdatedAtAgo()
     {
-        return $this->updateddAt;
+        return $this->updatedAt;
     }
 
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self

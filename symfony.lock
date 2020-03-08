@@ -55,6 +55,19 @@
             "./src/Repository/.gitignore"
         ]
     },
+    "doctrine/doctrine-migrations-bundle": {
+        "version": "1.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.2",
+            "ref": "c1431086fec31f17fbcfe6d6d7e92059458facc1"
+        },
+        "files": [
+            "./config/packages/doctrine_migrations.yaml",
+            "./src/Migrations/.gitignore"
+        ]
+    },
     "doctrine/event-manager": {
         "version": "1.1.0"
     },
@@ -67,6 +80,9 @@
     "doctrine/lexer": {
         "version": "1.2.0"
     },
+    "doctrine/migrations": {
+        "version": "2.2.1"
+    },
     "doctrine/orm": {
         "version": "v2.7.1"
     },
@@ -75,6 +91,9 @@
     },
     "doctrine/reflection": {
         "version": "v1.1.0"
+    },
+    "egulias/email-validator": {
+        "version": "2.1.17"
     },
     "fig/link-util": {
         "version": "1.1.0"
@@ -94,11 +113,17 @@
             "./config/packages/nelmio_cors.yaml"
         ]
     },
+    "nesbot/carbon": {
+        "version": "2.31.0"
+    },
     "nikic/php-parser": {
         "version": "v4.3.0"
     },
     "ocramius/package-versions": {
         "version": "1.5.1"
+    },
+    "ocramius/proxy-manager": {
+        "version": "2.2.3"
     },
     "php": {
         "version": "7.3"
@@ -126,6 +151,21 @@
     },
     "psr/log": {
         "version": "1.1.2"
+    },
+    "sensio/framework-extra-bundle": {
+        "version": "5.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "5.2",
+            "ref": "fb7e19da7f013d0d422fa9bce16f5c510e27609b"
+        },
+        "files": [
+            "./config/packages/sensio_framework_extra.yaml"
+        ]
+    },
+    "swiftmailer/swiftmailer": {
+        "version": "v6.2.3"
     },
     "symfony/asset": {
         "version": "v5.0.5"
@@ -291,6 +331,36 @@
     "symfony/service-contracts": {
         "version": "v2.0.1"
     },
+    "symfony/stopwatch": {
+        "version": "v5.0.5"
+    },
+    "symfony/swiftmailer-bundle": {
+        "version": "2.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "2.5",
+            "ref": "ae4d22af30bbd484506bc1817c5a3ef72c855b93"
+        },
+        "files": [
+            "./config/packages/dev/swiftmailer.yaml",
+            "./config/packages/swiftmailer.yaml",
+            "./config/packages/test/swiftmailer.yaml"
+        ]
+    },
+    "symfony/translation": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "2ad9d2545bce8ca1a863e50e92141f0b9d87ffcd"
+        },
+        "files": [
+            "./config/packages/translation.yaml",
+            "./translations/.gitignore"
+        ]
+    },
     "symfony/translation-contracts": {
         "version": "v2.0.1"
     },
@@ -344,5 +414,11 @@
     },
     "willdurand/negotiation": {
         "version": "v2.3.1"
+    },
+    "zendframework/zend-code": {
+        "version": "3.4.1"
+    },
+    "zendframework/zend-eventmanager": {
+        "version": "3.2.1"
     }
 }
