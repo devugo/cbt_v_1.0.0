@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ApiResource(
@@ -26,6 +29,7 @@ class AccountType
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"account_type:read"})
      */
     private $id;
 
@@ -37,7 +41,7 @@ class AccountType
      *  minMessage="Title must be at least {{ limit }} characters long",
      *  maxMessage="Title cannot be longer than {{ limit }} characters"
      * )
-     * @Groups({"account_type:read", "account_type:write"})
+     * @Groups({"account_type:read", "account_type:write", "user:read"})
      */
     private $title;
 
@@ -69,13 +73,56 @@ class AccountType
      * @ORM\Column(type="json", nullable=true)
      * @Groups({"account_type:read", "account_type:write"})
      */
-    private $notificatioPrivileges = [];
+    private $notificationsPrivileges = [];
 
     /**
      * @ORM\Column(type="json", nullable=true)
      * @Groups({"account_type:read", "account_type:write"})
      */
     private $levelsPrivileges = [];
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="accountType")
+     */
+    private $users;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="createdAccountTypes")
+     * @ORM\JoinColumn(nullable=true)
+     * @Groups({"account_type:read", "account_type:write"})
+     */
+    private $createdBy;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @Groups({"account_type:read", "account_type:write"})
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @Groups({"account_type:read", "account_type:write"})
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     * @Groups({"account_type:read", "account_type:write"})
+     */
+    private $accountTypesPrivileges = [];
+
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     * @Groups({"account_type:read", "account_type:write"})
+     */
+    private $userGroupsPrivileges = [];
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+        $this->users = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -142,14 +189,14 @@ class AccountType
         return $this;
     }
 
-    public function getNotificatioPrivileges(): ?array
+    public function getNotificationsPrivileges(): ?array
     {
-        return $this->notificatioPrivileges;
+        return $this->notificationsPrivileges;
     }
 
-    public function setNotificatioPrivileges(?array $notificatioPrivileges): self
+    public function setNotificationsPrivileges(?array $notificationsPrivileges): self
     {
-        $this->notificatioPrivileges = $notificatioPrivileges;
+        $this->notificationsPrivileges = $notificationsPrivileges;
 
         return $this;
     }
@@ -162,6 +209,117 @@ class AccountType
     public function setLevelsPrivileges(?array $levelsPrivileges): self
     {
         $this->levelsPrivileges = $levelsPrivileges;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setAccountType($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            // set the owning side to null (unless already changed)
+            if ($user->getAccountType() === $this) {
+                $user->setAccountType(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+    * Human Readable date; How long ago was the resource created
+    * 
+    * @Groups({"account_type:read"})
+    */
+   public function getCreatedAtAgo()
+   {
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
+   }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+    
+    /**
+    * Human Readable date; How long ago was the resource updated
+    * 
+    * @Groups({"account_type:read"})
+    */
+   public function getUpdatedAtAgo()
+   {
+        return Carbon::instance($this->getUpdatedAt())->diffForHumans();
+   }
+
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getAccountTypesPrivileges(): ?array
+    {
+        return $this->accountTypesPrivileges;
+    }
+
+    public function setAccountTypesPrivileges(?array $accountTypesPrivileges): self
+    {
+        $this->accountTypesPrivileges = $accountTypesPrivileges;
+
+        return $this;
+    }
+
+    public function getUserGroupsPrivileges(): ?array
+    {
+        return $this->userGroupsPrivileges;
+    }
+
+    public function setUserGroupsPrivileges(?array $userGroupsPrivileges): self
+    {
+        $this->userGroupsPrivileges = $userGroupsPrivileges;
 
         return $this;
     }

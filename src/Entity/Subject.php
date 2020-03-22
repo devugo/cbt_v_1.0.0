@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
@@ -31,6 +32,7 @@ class Subject
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"subject:read"})
      */
     private $id;
 
@@ -98,6 +100,7 @@ class Subject
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->isActiveActionAt = new \DateTimeImmutable();
         $this->questions = new ArrayCollection();
     }
 
@@ -166,7 +169,7 @@ class Subject
      */
     public function getIsActiveActionAtAgo()
     {
-        return $this->isActiveActionAt;
+        return Carbon::instance($this->getIsActiveActionAt())->diffForHumans();
     }
 
     public function setIsActiveActionAt(?\DateTimeInterface $isActiveActionAt): self
@@ -188,7 +191,7 @@ class Subject
      */
     public function getCreatedAtAgo()
     {
-        return $this->createdAt;
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function setCreatedAt(\DateTimeInterface $createdAt): self
@@ -210,7 +213,7 @@ class Subject
      */
     public function getUpdatedAtAgo()
     {
-        return $this->updatedAt;
+        return Carbon::instance($this->getUpdatedAt())->diffForHumans();
     }
 
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
@@ -45,7 +46,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *  }
  * )
  * @ApiFilter(BooleanFilter::class, properties={"isActive", "isAdmin", "isModerator", "isTaker", "isDeleted"})
- * @UniqueEntity(fields={"email", "username"})
+ * @UniqueEntity(fields={"email"})
+ * @UniqueEntity(fields={"username"})
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
@@ -55,6 +57,7 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"user:read"})
      */
     private $id;
 
@@ -99,7 +102,7 @@ class User implements UserInterface
      * @SerializedName("password")
      * @Assert\NotBlank
      */
-    private $plainPassword;
+    private $plainPassword = 'password';
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -128,14 +131,12 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=70, nullable=true)
      * @Assert\Length(
-     *  min=3,
      *  max=70,
-     *  minMessage="Othernames must be at least {{ limit }} characters long",
      *  maxMessage="Othernames cannot be longer than {{ limit }} characters"
      * )
      * @Groups({"user:read", "user:write"})
      */
-    private $othernames;
+    private $othernames = '';
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -291,6 +292,35 @@ class User implements UserInterface
      */
     private $examsCreated;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\AccountType", inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"user:read", "user:write"})
+     */
+    private $accountType;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\AccountType", mappedBy="createdBy")
+     */
+    private $createdAccountTypes;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ApiAuditTrail", mappedBy="user")
+     */
+    private $apiAuditTrails;
+
+    /**
+     * @ORM\Column(type="string", length=6, nullable=true)
+     * @Groups({"user:read", "user:write"})
+     */
+    private $sex;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"user:read", "user:write"})
+     */
+    private $dob;
+
     
     public function __construct()
     {
@@ -305,6 +335,8 @@ class User implements UserInterface
         $this->createdGroups = new ArrayCollection();
         $this->exams = new ArrayCollection();
         $this->examsCreated = new ArrayCollection();
+        $this->createdAccountTypes = new ArrayCollection();
+        $this->apiAuditTrails = new ArrayCollection();
     }
 
 
@@ -477,7 +509,7 @@ class User implements UserInterface
      */
     public function getIsActiveActionAtAgo()
     {
-        return $this->isActiveActionAt;
+        return Carbon::instance($this->getIsActiveActionAt())->diffForHumans();
     }
 
     public function setIsActiveActionAt(?\DateTimeInterface $isActiveActionAt): self
@@ -523,7 +555,7 @@ class User implements UserInterface
      */
     public function getCreatedAtAgo()
     {
-        return $this->createdAt;
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function setCreatedAt(\DateTimeInterface $createdAt): self
@@ -545,7 +577,7 @@ class User implements UserInterface
      */
     public function getUpdatedAtAgo()
     {
-        return $this->updatedAt;
+        return Carbon::instance($this->getUpdatedAt())->diffForHumans();
     }
 
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
@@ -890,6 +922,104 @@ class User implements UserInterface
                 $examsCreated->setCreatedBy(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAccountType(): ?AccountType
+    {
+        return $this->accountType;
+    }
+
+    public function setAccountType(?AccountType $accountType): self
+    {
+        $this->accountType = $accountType;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AccountType[]
+     */
+    public function getCreatedAccountTypes(): Collection
+    {
+        return $this->createdAccountTypes;
+    }
+
+    public function addCreatedAccountType(AccountType $createdAccountType): self
+    {
+        if (!$this->createdAccountTypes->contains($createdAccountType)) {
+            $this->createdAccountTypes[] = $createdAccountType;
+            $createdAccountType->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedAccountType(AccountType $createdAccountType): self
+    {
+        if ($this->createdAccountTypes->contains($createdAccountType)) {
+            $this->createdAccountTypes->removeElement($createdAccountType);
+            // set the owning side to null (unless already changed)
+            if ($createdAccountType->getCreatedBy() === $this) {
+                $createdAccountType->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ApiAuditTrail[]
+     */
+    public function getApiAuditTrails(): Collection
+    {
+        return $this->apiAuditTrails;
+    }
+
+    public function addApiAuditTrail(ApiAuditTrail $apiAuditTrail): self
+    {
+        if (!$this->apiAuditTrails->contains($apiAuditTrail)) {
+            $this->apiAuditTrails[] = $apiAuditTrail;
+            $apiAuditTrail->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApiAuditTrail(ApiAuditTrail $apiAuditTrail): self
+    {
+        if ($this->apiAuditTrails->contains($apiAuditTrail)) {
+            $this->apiAuditTrails->removeElement($apiAuditTrail);
+            // set the owning side to null (unless already changed)
+            if ($apiAuditTrail->getUser() === $this) {
+                $apiAuditTrail->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getSex(): ?string
+    {
+        return $this->sex;
+    }
+
+    public function setSex(?string $sex): self
+    {
+        $this->sex = $sex;
+
+        return $this;
+    }
+
+    public function getDob(): ?string
+    {
+        return $this->dob;
+    }
+
+    public function setDob(?string $dob): self
+    {
+        $this->dob = $dob;
 
         return $this;
     }

@@ -1,0 +1,35 @@
+{
+    "devDependencies": {
+        "@babel/preset-react": "^7.8.3",
+        "@symfony/webpack-encore": "^0.28.2",
+        "core-js": "^3.0.0",
+        "node-sass": "^4.13.1",
+        "regenerator-runtime": "^0.13.2",
+        "sass-loader": "7.0.1",
+        "webpack-notifier": "^1.6.0"
+    },
+    "license": "UNLICENSED",
+    "private": true,
+    "scripts": {
+        "dev-server": "encore dev-server",
+        "dev": "encore dev",
+        "watch": "encore dev --watch",
+        "build": "encore production --progress"
+    },
+    "dependencies": {
+        "@material-ui/core": "^4.9.5",
+        "@material-ui/icons": "^4.9.1",
+        "@material-ui/lab": "^4.0.0-alpha.46",
+        "antd": "^4.0.2",
+        "axios": "^0.19.2",
+        "crypto-js": "^4.0.0",
+        "prop-types": "^15.7.2",
+        "react": "^16.13.0",
+        "react-bootstrap4-form-validation": "^1.0.10",
+        "react-dom": "^16.13.0",
+        "react-js-pagination": "^3.0.3",
+        "react-redux": "^7.2.0",
+        "redux": "^4.0.5",
+        "redux-thunk": "^2.3.0"
+    }
+}

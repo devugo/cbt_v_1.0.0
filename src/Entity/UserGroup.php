@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -30,6 +31,7 @@ class UserGroup
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"user_group:read"})
      */
     private $id;
 
@@ -113,6 +115,7 @@ class UserGroup
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->isActiveActionAt = new \DateTimeImmutable();
         $this->exams = new ArrayCollection();
     }
 
@@ -193,7 +196,7 @@ class UserGroup
      */
     public function getCreatedAtAgo()
     {
-        return $this->createdAt;
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function setCreatedAt(\DateTimeInterface $createdAt): self
@@ -215,7 +218,7 @@ class UserGroup
     */
    public function getUpdatedAtAgo()
    {
-       return $this->updateddAt;
+        return Carbon::instance($this->getUpdatedAt())->diffForHumans();
    }
 
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
@@ -256,7 +259,7 @@ class UserGroup
      */
     public function getIsActiveActionAtAgo()
     {
-        return $this->isActiveActionAt;
+        return Carbon::instance($this->getIsActiveActionAt())->diffForHumans();
     }
 
     /**

@@ -27,3 +27,34 @@ if(!function_exists('default_password'))
         return 'password';
     }
 }
+
+if(!function_exists('can_resource'))
+{
+    //  Check if a use rcxan take action on any resource
+    function can_resource($user, $action, $resource){
+        switch($resource){
+            case 'users':
+                return $user->getAccountType()->getUsersPrivileges()[$action];
+            break;
+            case 'subjects':
+                return $user->getAccountType()->getSubjectsPrivileges()[$action];  
+            break;
+            case 'questions':
+                return $user->getAccountType()->getQuestionsPrivileges()[$action];
+            break;
+            case 'notifications':
+                return $user->getAccountType()->getNotificationsPrivileges()[$action];
+            break;
+            case 'levels':
+                return $user->getAccountType()->getLevelsPrivileges()[$action];
+            break;
+            case 'account_types':
+                return $user->getAccountType()->getAccountTypesPrivileges()[$action];
+            break;
+            case 'user_groups':
+                return $user->getAccountType()->getUserGroupsPrivileges()[$action];
+            default:
+                return false;
+        }
+    }
+}

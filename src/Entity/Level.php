@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -21,7 +22,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *  }
  * )
  * @UniqueEntity(fields={"title"})
- * @ApiFilter(SearchFilter::class, properties={"title":"exact"})
+ * @ApiFilter(SearchFilter::class, properties={"title":"exact", "createdBy":"exact"})
  * @ORM\Table(name="levels")
  * @ORM\Entity(repositoryClass="App\Repository\LevelRepository")
  */
@@ -31,6 +32,7 @@ class Level
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"level:read"})
      */
     private $id;
 
@@ -45,6 +47,12 @@ class Level
      * @Groups({"level:read", "level:write"})
      */
     private $title;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups({"level:read", "level:write"})
+     */
+    private $description;
 
     /**
      * @ORM\Column(type="datetime")
@@ -73,6 +81,7 @@ class Level
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
         $this->questions = new ArrayCollection();
     }
 
@@ -93,6 +102,18 @@ class Level
         return $this;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -105,7 +126,7 @@ class Level
      */
     public function getCreatedAtAgo()
     {
-        return $this->createdAt;
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function setCreatedAt(\DateTimeInterface $createdAt): self
@@ -127,7 +148,7 @@ class Level
      */
     public function getUpdatedAtAgo()
     {
-        return $this->updatedAt;
+        return Carbon::instance($this->getUpdatedAt())->diffForHumans();
     }
 
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
