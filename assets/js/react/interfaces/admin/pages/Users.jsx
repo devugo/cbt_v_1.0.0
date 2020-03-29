@@ -11,6 +11,7 @@ import Pagination from '@material-ui/lab/Pagination';
 
 import * as UsersActions from '../../../store/actions/users';
 import * as AccountTypesActions from '../../../store/actions/account-types';
+import * as UserGroupsActions from '../../../store/actions/user-groups';
 import Breadcrumb from '../components/Breadcrumb';
 import useWindowWidth from '../../../helpers/hooks/useWindowWidth';
 import UploadButton from '../../../UIElements/UploadButton';
@@ -34,7 +35,8 @@ const emptyFormData = {
     sex: '',
     accountType: '',
     email: '',
-    image: ''
+    image: '',
+    userGroup: ''
 };
 
 const clearErrors = {
@@ -70,6 +72,7 @@ const Users = () => {
     const [filteredUsers, setFilteredUsers] = useState(users);
     const totalUsers = useSelector(state => state.users.count);
     const accountTypes = useSelector(state => state.accountTypes.data);
+    const userGroups = useSelector(state => state.userGroups.data);
     const dispatch = useDispatch();
     
     // Datatable states
@@ -175,7 +178,7 @@ const Users = () => {
             if(fileContent.size > 500000){
                 setErrors({
                     ...errors,
-                    file: 'The maximum logo size is 500KB'
+                    file: 'The maximum image size is 500KB'
                 });
                 setLoading({
                     ...loading,
@@ -214,6 +217,8 @@ const Users = () => {
     const getSingleUser = useCallback((val, data) => {
         let user = data.find(user => user.id === val);
 
+        console.log(user);
+
         setFormData({
             ...formData,
             firstname: user.firstname,
@@ -224,8 +229,24 @@ const Users = () => {
             email: user.email,
             dob: user.dob,
             sex: user.sex,
-            accountType: user.accountType['@id']
+            userGroup: user.userGroup
         });
+
+        if(user.accountType){
+            setFormData({
+                ...formData,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                othernames: user.othernames,
+                photo: user.photo,
+                username: user.username,
+                email: user.email,
+                dob: user.dob,
+                sex: user.sex,
+                userGroup: user.userGroup,
+                accountType: user.accountType['@id']
+            });
+        }
 
         if(user.photo != ''){
             axios({
@@ -314,6 +335,7 @@ const Users = () => {
         form.append('sex', formData.sex);
         form.append('accountType', formData.accountType);
         form.append('image', formData.image);
+        form.append('userGroup', formData.userGroup);
 
         try {
             await dispatch(UsersActions.update(idToEdit, form));
@@ -361,6 +383,7 @@ const Users = () => {
         form.append('sex', formData.sex);
         form.append('accountType', formData.accountType);
         form.append('image', formData.image);
+        form.append('userGroup', formData.userGroup);
 
         try {
             await dispatch(UsersActions.create(form));
@@ -412,6 +435,15 @@ const Users = () => {
 
         try {
             await dispatch(AccountTypesActions.read(page, pagination));
+        } catch(error) {
+            Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
+        }
+    }, [dispatch, Notification]);
+
+    const getUserGroups = useCallback(async (page = 1, pagination = false) => {
+
+        try {
+            await dispatch(UserGroupsActions.read(page, pagination));
         } catch(error) {
             Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
         }
@@ -503,11 +535,14 @@ const Users = () => {
     useEffect(() => {
         getUsers();
         getAccountTypes();
+        getUserGroups();
     }, []);
 
     useEffect(() => {
         setFilteredUsers(users);
     }, [users]);
+
+    console.log(formData);
 
     return (
         <>
@@ -697,7 +732,8 @@ const Users = () => {
                         <div className="col-lg-6 col-md-6">
                             <div className="form-group">
                                 <label htmlFor="username">Username</label>
-                                <TextInput name="username" id="username"
+                                <TextInput name="username" id="username" required
+                                    errorMessage={{required:"Please enter username"}}
                                     value={formData.username}
                                     onChange={changeFormData}
                                 />
@@ -711,7 +747,6 @@ const Users = () => {
                                 <TextInput name="dob" id="dob" required type="date"
                                     value={formData.dob}
                                     onChange={changeFormData}
-                                    errorMessage={{required:"Please enter the date of birth of user"}}
                                 />
                             </div>
                         </div>
@@ -748,13 +783,30 @@ const Users = () => {
                                 <label htmlFor="accountType">Account Type</label>
                                 <SelectGroup name="accountType" id="accountType"
                                     value={formData.accountType}
-                                    required
-                                    errorMessage="Please a select an accont type"
                                     onChange={changeFormData}
                                 >
                                     <option value="">--- Please select ---</option>
                                     {
                                         accountTypes.map((accType, index) => <option key={index} value={accType.iri}>{accType.title}</option>)
+                                    }
+                                </SelectGroup>
+                                <small>Select the type of admin or leave empty for exam takers</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-lg-6 col-md-6">
+                            <div className="form-group">
+                                <label htmlFor="userGroup">User Group</label>
+                                <SelectGroup name="userGroup" id="userGRoup"
+                                    value={formData.userGroup}
+                                    required
+                                    errorMessage="Please a select a user group"
+                                    onChange={changeFormData}
+                                >
+                                    <option value="">--- Please select ---</option>
+                                    {
+                                        userGroups.map((userGroup, index) => <option key={index} value={userGroup.iri}>{`${userGroup.title} NGN(${userGroup.cost})`}</option>)
                                     }
                                 </SelectGroup>
                             </div>

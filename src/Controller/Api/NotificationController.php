@@ -4,7 +4,6 @@ namespace App\Controller\Api;
 
 use App\Entity\Notification;
 use App\Entity\ApiAuditTrail;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\NotificationRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -90,7 +89,7 @@ class NotificationController extends AbstractController
         if(!can_resource($this->getUser(), 'create', 'notifications')){
 
             $response = new JsonResponse([
-                'errors' => $serializer->serialize('Access denied', 'jsonld')
+                'errors' => $serializer->serialize('Access denied. You can\'t create nomtification', 'jsonld')
             ], 403);
             
             $api_audit_trail->setResponseData((array) $response);
@@ -99,27 +98,31 @@ class NotificationController extends AbstractController
             
             return $response;
         }
-        $notification = new Notification();
+        $sentNotifications = array(); // Store all sent notifications
        
-        $notification->setTitle($content['title'])
-        ->setMessage($content['message'])
-        ->setSentBy($this->getUser())
-        ->setSentBy($iriConverter->getItemFromIri($content['sentTo']))
-        ->setActionLink($content['actionLink'])
-        ;
-
-        $errors = $validator->validate($notification);
-        if(count($errors) > 0){
-            $response = new JsonResponse([
-                'errors' => $serializer->serialize($errors, 'jsonld')
-            ], 401); 
-        }else{
+        // create notification for all the users selected
+        foreach($content['sentTo'] as $iri){
+            $notification = new Notification();
+            $user = $iriConverter->getItemFromIri($iri);
+            if(!$user){
+                // skip to next loop if user doesn't exist
+                continue;
+            }
+            $notification->setTitle($content['title'])
+                ->setMessage($content['message'])
+                ->setSentBy($this->getUser())
+                ->setSentTo($user)
+                ->setActionLink($content['actionLink'])
+            ;
             $entityManager->persist($notification);
             $entityManager->flush();
-            $response = new JsonResponse([
-                'notification' => $serializer->serialize($notification, 'jsonld')
-            ]);
+
+            array_push($sentNotifications, $notification);
         }
+    
+        $response = new JsonResponse([
+            'notifications' => $serializer->serialize($sentNotifications, 'jsonld')
+        ]);
 
         // continue audit trail
         $api_audit_trail->setResponseData((array) $response);
@@ -270,5 +273,66 @@ class NotificationController extends AbstractController
         // End Store request trail
 
         return $response;
+    }
+
+     /**
+     * @Route("/notification-api/mark/{id}", name="mark_notification", methods={"PUT"})
+     */
+    public function mark($id, Request $request, NotificationRepository $notificationRepository, SerializerInterface $serializer, EntityManagerInterface $entityManager)
+    {
+
+        // Store request trail
+        $api_audit_trail = new ApiAuditTrail();
+        $api_audit_trail->setTypeOfRequest('PUT')
+            ->setEndpoint(base_url() . '/notification-api/mark/'.$id)
+            ->setUser($this->getUser())
+        ;
+        
+        // check if notification exists
+        $notification = $notificationRepository->find($id);
+        if(!$notification){
+            $response = new JsonResponse([
+                'errors' => $serializer->serialize('Notification doesn\'t exist', 'jsonld')
+            ], 401);
+
+            $api_audit_trail->setResponseData((array) $response);
+            $entityManager->persist($api_audit_trail);
+            $entityManager->flush();
+            
+            return $response;
+        }
+        
+        if(!can_resource($this->getUser(), 'update', 'notifications')){
+
+            $response = new JsonResponse([
+                'errors' => $serializer->serialize('Access denied', 'jsonld')
+            ], 403);
+            
+            $api_audit_trail->setResponseData((array) $response);
+            $entityManager->persist($api_audit_trail);
+            $entityManager->flush();
+            
+            return $response;
+        }
+
+        // if($this->getUser()->getIsAdmin() === false){
+        //     return new JsonResponse([
+        //         'message' => 'Access Denied!'
+        //     ], 401); 
+        // }
+
+        if($notification->getSeenAt() == NULL){
+            $notification->setSeenAt(new \DateTimeImmutable());
+        }else{
+            $notification->setSeenAt(NULL);
+        }
+        $notification->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($notification);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'notification' => $serializer->serialize($notification, 'jsonld')
+
+        ], 201);
     }
 }

@@ -8,6 +8,7 @@ export const CREATE_USER = 'CREATE_USER';
 export const DELETE_USER = 'DELETE_USER';
 export const UPDATE_USER = 'UPDATE_USER';
 export const ACTIVATE_USER = 'ACTIVATE_USER';
+export const GET_AUTH_USER = 'GET_AUTH_USER';
 
 export const create = (form) => {
     return async (dispatch, getState) => {
@@ -38,7 +39,7 @@ export const read = (page = 1, pagination = true) => {
         try {
             const response = await axios({
                 method: 'GET',
-                url: `${ENV.HOST}/api/users?page=${page}&pagination={pagination}`,
+                url: `${ENV.HOST}/api/users?page=${page}&pagination=${pagination}`,
                 headers: ENV.HEADERS
             });
             if(response.status != 200){
@@ -47,7 +48,7 @@ export const read = (page = 1, pagination = true) => {
             const resData = await response.data['hydra:member'];
             const totalData = await response.data['hydra:totalItems'];
 
-            let usersData = resData.map(user => new User(user.id, user['@id'], user.photo, `${user.lastname} ${user.firstname} ${user.othernames}`, user.email, user.username, user.dob, user.sex, user.accountType, user.createdAtAgo, user.updatedAtAgo, user.isActive, user.firstname, user.lastname, user.othernames));
+            let usersData = resData.map(user => new User(user.id, user['@id'], user.photo, `${user.lastname} ${user.firstname} ${user.othernames}`, user.email, user.username, user.dob, user.sex, user.accountType, user.createdAtAgo, user.updatedAtAgo, user.isActive, user.firstname, user.lastname, user.othernames, user.mobile, user.userGroup));
 
             dispatch({
                 type: READ_USERS,
@@ -124,6 +125,33 @@ export const activate = (id, type) => {
                 data: userData
             });
         }catch(err){
+            throw err;
+        }
+    }
+}
+
+export const auth = (iri = null) => {
+    return async (dispatch, getState) => {
+        // console.log(getState());
+        try {
+            const response = await axios({
+                method: 'GET',
+                url: `${ENV.HOST}${ENV.IRI}`,
+                headers: ENV.HEADERS
+            });
+            if(response.status != 200){
+                throw new Error(ENV.ERRORDESC);
+            }
+            const resData = await response;
+            const user = resData.data;
+
+            let userData  = new User(user.id, user['@id'], user.photo, `${user.lastname} ${user.firstname} ${user.othernames}`, user.email, user.username, user.dob, user.sex, user.accountType, user.createdAtAgo, user.updatedAtAgo, user.isActive, user.firstname, user.lastname, user.othernames, user.mobile, user.userGroup);
+
+            dispatch({
+                type: GET_AUTH_USER,
+                data: userData
+            });
+        } catch (err){
             throw err;
         }
     }

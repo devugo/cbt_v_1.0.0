@@ -24,7 +24,8 @@ export default (state = initialState, action) => {
                 action.data.isActive, 
                 action.data.createdBy,
                 action.data.createdAtAgo,
-                action.data.updatedAtAgo
+                action.data.updatedAtAgo,
+                action.data.noOfExams
             );
             return {
                 ...state,
@@ -50,7 +51,8 @@ export default (state = initialState, action) => {
                 action.data.isActive, 
                 action.data.createdBy,
                 action.data.createdAtAgo,
-                action.data.updatedAtAgo
+                action.data.updatedAtAgo,
+                action.data.noOfExams
             );
             const userGroupIndex = userGroups.findIndex(userGrp => userGrp.id === updatedUserGroup.id);
 
@@ -72,7 +74,8 @@ export default (state = initialState, action) => {
                 action.data.isActive, 
                 action.data.createdBy,
                 action.data.createdAtAgo,
-                action.data.updatedAtAgo
+                action.data.updatedAtAgo,
+                action.data.noOfExams
             );
             const userGroupActivatedIndex = existingUserGroups.findIndex(user => user.id === activatedUserGroup.id);
 

@@ -53,6 +53,10 @@ if(!function_exists('can_resource'))
             break;
             case 'user_groups':
                 return $user->getAccountType()->getUserGroupsPrivileges()[$action];
+            break;
+            case 'exams':
+                return $user->getAccountType()->getExamsPrivileges()[$action];
+            break;
             default:
                 return false;
         }

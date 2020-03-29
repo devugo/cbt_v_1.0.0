@@ -45,7 +45,7 @@ export const read = (page = 1, pagination = true) => {
             const resData = await response.data['hydra:member'];
             const totalData = await response.data['hydra:totalItems'];
 
-            let accountTypesData = resData.map(accType => new AccountType(accType.id, accType['@id'], accType.title, accType.description, accType.usersPrivileges, accType.subjectsPrivileges, accType.questionsPrivileges, accType.notificationsPrivileges, accType.levelsPrivileges, accType.accountTypesPrivileges, accType.userGroupsPrivileges, accType.createdBy, accType.createdAtAgo, accType.updatedAtAgo));
+            let accountTypesData = resData.map(accType => new AccountType(accType.id, accType['@id'], accType.title, accType.description, accType.usersPrivileges, accType.subjectsPrivileges, accType.questionsPrivileges, accType.notificationsPrivileges, accType.levelsPrivileges, accType.accountTypesPrivileges, accType.userGroupsPrivileges, accType.examsPrivileges, accType.createdBy, accType.createdAtAgo, accType.updatedAtAgo));
 
             dispatch({
                 type: READ_ACCOUNT_TYPES,

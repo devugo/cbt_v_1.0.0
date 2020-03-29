@@ -109,10 +109,11 @@ class UserController extends AbstractController
             $newFilename = $uploaderHelper->uploadUserAvatar($uploadedFile, null);
             $user->setPhoto($newFilename);
         }
-        $accType = $iriConverter->getItemFromIri($request->get('accountType'));
 
         $plainPassword = default_password();
         $encoded = $passwordEncoder->encodePassword($user, $plainPassword);
+
+        $userGroup = $iriConverter->getItemFromIri($request->get('userGroup'));
 
         $user->setFirstname($request->get('firstname'))
             ->setLastname($request->get('lastname'))
@@ -122,9 +123,15 @@ class UserController extends AbstractController
             ->setUsername($request->get('username'))
             ->setEmail($request->get('email'))
             ->setPassword($encoded)
-            ->setAccountType($accType)
+            ->setUserGroup($userGroup)
             ->setIsActive(true)
         ;
+
+        if($request->get('accountType')){
+            $accType = $iriConverter->getItemFromIri($request->get('accountType'));
+            $user->setAccountType($accType)
+                ->setRoles(["ROLE_ADMIN"]);
+        }
 
         $errors = $validator->validate($user);
         if(count($errors) > 0){
@@ -195,7 +202,8 @@ class UserController extends AbstractController
             $newFilename = $uploaderHelper->uploadUserAvatar($uploadedFile, $user->getPhoto());
             $user->setPhoto($newFilename);
         }
-        $accType = $iriConverter->getItemFromIri($request->get('accountType'));
+        
+        $userGroup = $iriConverter->getItemFromIri($request->get('userGroup'));
        
         /** @var User $user */
         $user->setFirstname($request->get('firstname'))
@@ -205,8 +213,15 @@ class UserController extends AbstractController
             ->setSex($request->get('sex'))
             ->setUsername($request->get('username'))
             ->setEmail($request->get('email'))
-            ->setAccountType($accType)
+            ->setUserGroup($userGroup)
+            ->setUpdatedAt(new \DateTimeImmutable())
         ;
+        
+        if($request->get('accountType')){
+            $accType = $iriConverter->getItemFromIri($request->get('accountType'));
+            $user->setAccountType($accType)
+                ->setRoles(["ROLE_ADMIN"]);
+        }
 
         $errors = $validator->validate($user);
         if(count($errors) > 0){

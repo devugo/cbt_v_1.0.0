@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -26,6 +27,7 @@ class Question
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"question:read"})
      */
     private $id;
 
@@ -248,7 +250,7 @@ class Question
      */
     public function getCreatedAtAgo()
     {
-        return $this->createdAt;
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function setCreatedAt(\DateTimeInterface $createdAt): self
@@ -270,7 +272,7 @@ class Question
      */
     public function getUpdatedAtAgo()
     {
-        return $this->updatedAt;
+        return Carbon::instance($this->getUpdatedAt())->diffForHumans();
     }
 
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self

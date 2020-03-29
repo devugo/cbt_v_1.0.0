@@ -1,5 +1,5 @@
 export const decrypt = (val) => {
-    if(localStorage.getItem("greckallowmeiri") === null) {
+    if(localStorage.getItem(val) === null) {
         return null;
     }
     let CryptoJS = require("crypto-js");

@@ -71,7 +71,7 @@ const Login = () => {
             setLoader(false);
             // setLoader(false);
         })
-    }, [ENV, formData]);
+    }, [ENV, formData, setLoader, setErrors]);
 
     return (
         <div className="login-content">

@@ -1,9 +1,10 @@
-import { READ_USERS, CREATE_USER, DELETE_USER, ACTIVATE_USER, UPDATE_USER } from '../actions/users';
+import { READ_USERS, CREATE_USER, DELETE_USER, ACTIVATE_USER, UPDATE_USER, GET_AUTH_USER } from '../actions/users';
 import User from '../../models/User';
 import { ITEMSPERPAGE } from '../../ENV';
 
 const initialState = {
     data: [],
+    auth: {},
     count: 0
 };
 
@@ -13,6 +14,12 @@ export default (state = initialState, action) => {
             return {
                 data: action.data,
                 count: action.count
+            };
+        case GET_AUTH_USER:
+            console.log(state);
+            return {
+                ...state,
+                auth: action.data
             };
         case CREATE_USER:
             const newUser = new User(
@@ -30,7 +37,9 @@ export default (state = initialState, action) => {
                 action.data.isActive,
                 action.data.firstname,
                 action.data.lastname,
-                action.data.othernames
+                action.data.othernames,
+                action.data.mobile,
+                action.data.userGroup
             );
             return {
                 ...state,
@@ -61,9 +70,11 @@ export default (state = initialState, action) => {
                 action.data.isActive,
                 action.data.firstname,
                 action.data.lastname,
-                action.data.othernames
+                action.data.othernames,
+                action.data.mobile,
+                action.data.userGroup
             );
-            const userIndex = users.findIndex(acc => acc.id === updatedUser.id);
+            const userIndex = users.findIndex(user => user.id === updatedUser.id);
 
             users[userIndex] = updatedUser;
 
@@ -88,7 +99,9 @@ export default (state = initialState, action) => {
                 action.data.isActive,
                 action.data.firstname,
                 action.data.lastname,
-                action.data.othernames
+                action.data.othernames,
+                action.data.mobile,
+                action.data.userGroup
             );
             const userActivatedIndex = existingUsers.findIndex(user => user.id === activatedUser.id);
 

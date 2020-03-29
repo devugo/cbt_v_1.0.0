@@ -294,7 +294,7 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\AccountType", inversedBy="users")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      * @Groups({"user:read", "user:write"})
      */
     private $accountType;
@@ -320,6 +320,12 @@ class User implements UserInterface
      * @Groups({"user:read", "user:write"})
      */
     private $dob;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\UserGroup", inversedBy="users")
+     * @Groups({"user:read", "user:write"})
+     */
+    private $userGroup;
 
     
     public function __construct()
@@ -1020,6 +1026,18 @@ class User implements UserInterface
     public function setDob(?string $dob): self
     {
         $this->dob = $dob;
+
+        return $this;
+    }
+
+    public function getUserGroup(): ?UserGroup
+    {
+        return $this->userGroup;
+    }
+
+    public function setUserGroup(?UserGroup $userGroup): self
+    {
+        $this->userGroup = $userGroup;
 
         return $this;
     }

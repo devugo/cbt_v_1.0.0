@@ -27,6 +27,7 @@ export default (state = initialState, action) => {
                 action.data.levelsPrivileges,
                 action.data.accountTypesPrivileges,
                 action.data.userGroupsPrivileges,
+                action.data.examsPrivileges,
                 action.data.createdBy,
                 action.data.createdAtAgo,
                 action.data.updatedAtAgo
@@ -57,6 +58,7 @@ export default (state = initialState, action) => {
                 action.data.levelsPrivileges,
                 action.data.accountTypesPrivileges,
                 action.data.userGroupsPrivileges,
+                action.data.examsPrivileges,
                 action.data.createdBy,
                 action.data.createdAtAgo,
                 action.data.updatedAtAgo

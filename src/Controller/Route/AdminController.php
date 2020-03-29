@@ -80,4 +80,20 @@ class AdminController extends AbstractController
     {
         return $this->render('admin/pages/notifications.html.twig');
     }
+
+    /**
+     * @Route("/admin/profile", name="admin_profile")
+     */
+    public function profile()
+    {
+        return $this->render('admin/pages/profile.html.twig');
+    }
+
+     /**
+     * @Route("/admin/settings", name="admin_settings")
+     */
+    public function settings()
+    {
+        return $this->render('admin/pages/settings.html.twig');
+    }
 }

@@ -1,5 +1,5 @@
 class AccountType {
-    constructor(id, iri, title, description, usersPrivileges, subjectsPrivileges, questionsPrivileges, notificationsPrivileges, levelsPrivileges, accountTypesPrivileges, userGroupsPrivileges, createdBy, createdAtAgo, updatedAtAgo ){
+    constructor(id, iri, title, description, usersPrivileges, subjectsPrivileges, questionsPrivileges, notificationsPrivileges, levelsPrivileges, accountTypesPrivileges, userGroupsPrivileges, examsPrivileges, createdBy, createdAtAgo, updatedAtAgo ){
         this.id = id;
         this.iri = iri;
         this.title = title;
@@ -11,6 +11,7 @@ class AccountType {
         this.levelsPrivileges = levelsPrivileges;
         this.accountTypesPrivileges = accountTypesPrivileges;
         this.userGroupsPrivileges = userGroupsPrivileges;
+        this.examsPrivileges = examsPrivileges;
         this.createdBy = createdBy;
         this.createdAtAgo = createdAtAgo;
         this.updatedAtAgo = updatedAtAgo;

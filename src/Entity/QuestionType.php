@@ -39,6 +39,7 @@ class QuestionType
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"question_type:read"})
      */
     private $id;
 

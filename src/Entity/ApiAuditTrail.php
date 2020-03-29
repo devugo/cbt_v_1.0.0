@@ -10,24 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
- * @ApiResource(
- *  collectionOperations={
- *      "get"={
- *          "method":"GET"
- *      }
- *  },
- *  itemOperations={
- *      "get"={
- *          "method"="GET"
- *      }
- *  },
- *  normalizationContext={"groups"={"api_audit_trail:read"}},
- *  denormalizationContext={"groups"={"api_audit_trail:write"}},
- *  attributes={
- *      "pagination_items_per_page"=10
- *  }
- * )
- * @ApiFilter(SearchFilter::class, properties={"user":"exact"})
+ * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\ApiAuditTrailRepository")
  */
 class ApiAuditTrail
@@ -36,49 +19,41 @@ class ApiAuditTrail
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"api_audit_trail:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
-     * @Groups({"api_audit_trail:read", "api_audit_trail:write"})
      */
     private $typeOfRequest;
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"api_audit_trail:read", "api_audit_trail:write"})
      */
     private $requestData = [];
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"api_audit_trail:read", "api_audit_trail:write"})
      */
     private $responseData = [];
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"api_audit_trail:read", "api_audit_trail:write"})
      */
     private $endpoint;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"api_audit_trail:read", "api_audit_trail:write"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"api_audit_trail:read", "api_audit_trail:write"})
      */
     private $updatedAt;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="apiAuditTrails")
-     * @Groups({"api_audit_trail:read", "api_audit_trail:write"})
      */
     private $user;
 

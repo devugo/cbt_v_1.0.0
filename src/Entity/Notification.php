@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -24,6 +25,7 @@ class Notification
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"notification:read"})
      */
     private $id;
 
@@ -167,6 +169,17 @@ class Notification
         return $this;
     }
 
+      /**
+     * Human Readable date; How long ago was the resource seen by the receiver
+     * 
+     * @Groups({"notification:read"})
+     */
+    public function getSeenAtAgo()
+    {
+        return $this->seenAt ? Carbon::instance($this->getSeenAt())->diffForHumans() : '';
+    }
+
+
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -179,7 +192,7 @@ class Notification
      */
     public function getCreatedAtAgo()
     {
-        return $this->createdAt;
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function setCreatedAt(\DateTimeInterface $createdAt): self
@@ -201,7 +214,7 @@ class Notification
      */
     public function getUpdatedAtAgo()
     {
-        return $this->updateddAt;
+        return Carbon::instance($this->getUpdatedAt())->diffForHumans();
     }
 
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self

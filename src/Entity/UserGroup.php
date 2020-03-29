@@ -111,12 +111,24 @@ class UserGroup
      */
     private $exams;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="userGroup")
+     */
+    private $users;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"user_group:read", "user_group:write"})
+     */
+    private $noOfExams;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->isActiveActionAt = new \DateTimeImmutable();
         $this->exams = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -286,6 +298,49 @@ class UserGroup
             $this->exams->removeElement($exam);
             $exam->removeGroup($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setUserGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            // set the owning side to null (unless already changed)
+            if ($user->getUserGroup() === $this) {
+                $user->setUserGroup(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getNoOfExams(): ?int
+    {
+        return $this->noOfExams;
+    }
+
+    public function setNoOfExams(int $noOfExams): self
+    {
+        $this->noOfExams = $noOfExams;
 
         return $this;
     }

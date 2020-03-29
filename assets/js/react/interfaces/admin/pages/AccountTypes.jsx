@@ -67,6 +67,12 @@ const emptyFormData = {
         read: false,
         update: false,
         delete: false
+    },
+    examsPrivileges: {
+        create: false,
+        read: false,
+        update: false,
+        delete: false
     }
 };
 
@@ -408,6 +414,43 @@ const AccountTypes = () => {
                     }
                 })
             break;
+
+            case 'exams_create':
+                setFormData({
+                    ...formData,
+                    examsPrivileges: {
+                        ...formData.examsPrivileges,
+                        create: !formData.examsPrivileges.create
+                    }
+                })
+            break;
+            case 'exams_read':
+                setFormData({
+                    ...formData,
+                    examsPrivileges: {
+                        ...formData.examsPrivileges,
+                        read: !formData.examsPrivileges.read
+                    }
+                })
+            break;
+            case 'exams_update':
+                setFormData({
+                    ...formData,
+                    examsPrivileges: {
+                        ...formData.examsPrivileges,
+                        update: !formData.examsPrivileges.update
+                    }
+                })
+            break;
+            case 'exams_delete':
+                setFormData({
+                    ...formData,
+                    examsPrivileges: {
+                        ...formData.examsPrivileges,
+                        delete: !formData.examsPrivileges.delete
+                    }
+                })
+            break;
         }
     }, [setFormData, formData])
 
@@ -448,7 +491,8 @@ const AccountTypes = () => {
             notificationsPrivileges: accType.notificationsPrivileges,
             levelsPrivileges: accType.levelsPrivileges,
             accountTypesPrivileges: accType.accountTypesPrivileges,
-            userGroupsPrivileges: accType.userGroupsPrivileges
+            userGroupsPrivileges: accType.userGroupsPrivileges,
+            examsPrivileges: accType.examsPrivileges
         });
     }, [accountTypes, formData, setFormData]);
 
@@ -585,6 +629,7 @@ const AccountTypes = () => {
             let levelsPrivileges = Object.keys(accType.levelsPrivileges).map((key, index) => accType.levelsPrivileges[key] === true ? <Tag key={index} style={{fontSize: 8}} color={ key === 'read' ? 'blue' : key === 'create' ? 'green' : key === 'update' ? 'yellow' : key === 'delete' ? 'red' : null}>{key}</Tag> : '')
             let accountTypesPrivileges = Object.keys(accType.accountTypesPrivileges).map((key, index) => accType.accountTypesPrivileges[key] === true ? <Tag key={index} style={{fontSize: 8}} color={ key === 'read' ? 'blue' : key === 'create' ? 'green' : key === 'update' ? 'yellow' : key === 'delete' ? 'red' : null}>{key}</Tag> : '')
             let userGroupsPrivileges = Object.keys(accType.userGroupsPrivileges).map((key, index) => accType.userGroupsPrivileges[key] === true ? <Tag key={index} style={{fontSize: 8}} color={ key === 'read' ? 'blue' : key === 'create' ? 'green' : key === 'update' ? 'yellow' : key === 'delete' ? 'red' : null}>{key}</Tag> : '')
+            let examsPrivileges = Object.keys(accType.examsPrivileges).map((key, index) => accType.examsPrivileges[key] === true ? <Tag key={index} style={{fontSize: 8}} color={ key === 'read' ? 'blue' : key === 'create' ? 'green' : key === 'update' ? 'yellow' : key === 'delete' ? 'red' : null}>{key}</Tag> : '')
 
             return (
                 <Fragment key={index}>
@@ -608,6 +653,7 @@ const AccountTypes = () => {
                         <td style={{fontSize: 10}}>{levelsPrivileges}</td>
                         <td style={{fontSize: 10}}>{accountTypesPrivileges}</td>
                         <td style={{fontSize: 10}}>{userGroupsPrivileges}</td>
+                        <td style={{fontSize: 10}}>{examsPrivileges}</td>
                         <td><Tag color="cyan">{accType.createdAtAgo}</Tag></td>
                         <td>
                             <Tooltip placement="top" title="Edit account type"><Edit onClick={() => changeEditContent(accType.id, accountTypes)} style={{cursor: "pointer"}} color="primary" /></Tooltip>
@@ -678,6 +724,7 @@ const AccountTypes = () => {
                                             <th>Levels Privileges</th>
                                             <th>Account Types Privileges</th>
                                             <th>User Groups Privileges</th>
+                                            <th>Exams Privileges</th>
                                             <th>Created</th>
                                             <th>Action</th>
                                         </tr>
@@ -852,6 +899,15 @@ const AccountTypes = () => {
                                 <Checkbox onChange={() => changeCheckboxForm('user_groups_read')} checked={formData.userGroupsPrivileges.read} />READ
                                 <Checkbox onChange={() => changeCheckboxForm('user_groups_update')} checked={formData.userGroupsPrivileges.update} />UPDATE
                                 <Checkbox onChange={() => changeCheckboxForm('user_groups_delete')} checked={formData.userGroupsPrivileges.delete} />DELETE
+                            </div>
+                        </div>
+                        <div className="col-lg-4 col-md-4">
+                            <div className="form-group">
+                                <label htmlFor="exams">Exams Priviliges</label><br />
+                                <Checkbox onChange={() => changeCheckboxForm('exams_create')} checked={formData.examsPrivileges.create} />CREATE
+                                <Checkbox onChange={() => changeCheckboxForm('exams_read')} checked={formData.examsPrivileges.read} />READ
+                                <Checkbox onChange={() => changeCheckboxForm('exams_update')} checked={formData.examsPrivileges.update} />UPDATE
+                                <Checkbox onChange={() => changeCheckboxForm('exams_delete')} checked={formData.examsPrivileges.delete} />DELETE
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 class Subject {
-    constructor(id, iri, title, description, cost, daysValidity, status, createdBy, createdAtAgo, updatedAtAgo ){
+    constructor(id, iri, title, description, cost, daysValidity, status, createdBy, createdAtAgo, updatedAtAgo, noOfExams ){
         this.id = id;
         this.iri = iri;
         this.title = title;
@@ -10,6 +10,7 @@ class Subject {
         this.createdBy = createdBy;
         this.createdAtAgo = createdAtAgo;
         this.updatedAtAgo = updatedAtAgo;
+        this.noOfExams = noOfExams;
     }
 }
 

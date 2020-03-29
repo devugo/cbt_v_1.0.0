@@ -18,6 +18,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 class UploaderHelper
 {
     const USER_AVATARS = 'user_avatars';
+    const EXPLANATION_RESOURCES = 'explanation_resources';
 
     private $uploadsPath;
     private $filesystem;
@@ -50,6 +51,26 @@ class UploaderHelper
 
         if($existingFilename) {
             $this->delete_image_from_storage($existingFilename, self::USER_AVATARS);
+            
+        }
+
+        return $newFilename;
+    }
+
+    public function uploadExplanationResource(UploadedFile $uploadedFile, ?string $existingFilename): string
+    {
+        $destination = $this->uploadsPath.'/'.self::EXPLANATION_RESOURCES;
+
+        $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME); // original client name without file extension
+        $newFilename = Urlizer::urlize($originalFilename).'-'.uniqid().'.'.$uploadedFile->guessExtension();
+
+        $uploadedFile->move(
+            $destination,
+            $newFilename
+        );
+
+        if($existingFilename) {
+            $this->delete_image_from_storage($existingFilename, self::EXPLANATION_RESOURCES);
             
         }
 

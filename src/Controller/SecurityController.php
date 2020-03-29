@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use GuzzleHttp\Client;
+use App\Entity\ApiAuditTrail;
 use Symfony\Component\Mime\Email;
 use App\Repository\UserRepository;
 use Symfony\Component\Mailer\Mailer;
@@ -16,14 +17,15 @@ use Symfony\Component\HttpFoundation\Response;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailSmtpTransport;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class SecurityController extends AbstractController
 {
@@ -88,12 +90,46 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/change-password", name="app_change-password", methods={"POST"})
+     * @Route("/change-password/{id}", name="app_change-password", methods={"POST"})
      */
-    public function change_password(EntityManagerInterface $entityManager, UserPasswordEncoderInterface $userPasswordEncoder, Request $request, UserRepository $userRepository)
+    public function change_password($id, EntityManagerInterface $entityManager, SerializerInterface $serializer, IriConverterInterface $iriConverter, UserPasswordEncoderInterface $userPasswordEncoder, Request $request, UserRepository $userRepository)
     {
         $data = json_decode($request->getContent(), true);
-        $user = $this->getUser();
+        $user = $userRepository->find($id);
+
+        // Store request trail
+        $api_audit_trail = new ApiAuditTrail();
+        $api_audit_trail->setTypeOfRequest('POST')
+            ->setRequestData((array) $data)
+            ->setEndpoint(base_url() . '/change-password/'.$id)
+            ->setUser($this->getUser())
+        ;
+
+         // check if user exists
+        if(!$user){
+            $response = new JsonResponse([
+                'errors' => $serializer->serialize('User doesn\'t exist', 'jsonld')
+            ], 401);
+
+            $api_audit_trail->setResponseData((array) $response);
+            $entityManager->persist($api_audit_trail);
+            $entityManager->flush();
+            
+            return $response;
+        }
+
+        if($user !== $this->getUser() && !can_resource($this->getUser(), 'update', 'users')){
+
+            $response = new JsonResponse([
+                'errors' => $serializer->serialize('Access denied', 'jsonld')
+            ], 403);
+            
+            $api_audit_trail->setResponseData((array) $response);
+            $entityManager->persist($api_audit_trail);
+            $entityManager->flush();
+            
+            return $response;
+        }
 
         $old_password = $data['oldPassword'];
         $new_password = $data['newPassword'];
@@ -106,12 +142,12 @@ class SecurityController extends AbstractController
             $entityManager->flush();
 
             return new JsonResponse([
-                'message' => 'Password was changed successfully'
+                'message' => $serializer->serialize('Password was changed successfully', 'jsonld')
     
             ], 201);
         }
         return new JsonResponse([
-            'message' => 'Invalid old password'
+            'message' => $serializer->serialize('Invalid old password', 'jsonld')
 
         ], 401);
     }

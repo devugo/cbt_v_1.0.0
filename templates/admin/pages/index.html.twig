@@ -16,10 +16,10 @@
             <div class="menu-sidebar2__content js-scrollbar1">
                 <div class="account2">
                     <div class="image img-cir img-120">
-                        <img src="{{ asset('images/icon/avatar-big-01.jpg') }}" alt="John Doe" />
+                        <img style="width: 130px; height: 130px" src="/uploads/user_avatars/{{ app.user.photo }}" alt="{{ app.user.username }} photo" />
                     </div>
-                    <h4 class="name">john doe</h4>
-                    <a href="#">Sign out</a>
+                    <h4 class="name">{{app.user.username}}</h4>
+                    <a href="/logout">Sign out</a>
                 </div>
                 <nav class="navbar-sidebar2">
                     <ul class="list-unstyled navbar__list">
@@ -45,7 +45,7 @@
                                 <i class="fas fa-align-right"></i>Levels</a>
                         </li>
                         <li>
-                            <a href="{{ path('admin_users') }}">
+                            <a href="{{ path('admin_questions') }}">
                                 <i class="fas fa-list-alt"></i>Questions</a>
                         </li>
                         <li>
@@ -59,41 +59,6 @@
                         <li>
                             <a href="{{ path('admin_notifications') }}">
                                 <i class="fas fa-bell"></i>Notifications</a>
-                        </li>
-                        <li>
-                            <a href="inbox.html">
-                                <i class="fas fa-chart-bar"></i>Inbox</a>
-                            <span class="inbox-num">3</span>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-shopping-basket"></i>eCommerce</a>
-                        </li>
-                        <li class="has-sub">
-                            <a class="js-arrow" href="#">
-                                <i class="fas fa-trophy"></i>Features
-                                <span class="arrow">
-                                    <i class="fas fa-angle-down"></i>
-                                </span>
-                            </a>
-                            <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li>
-                                    <a href="table.html">
-                                        <i class="fas fa-table"></i>Tables</a>
-                                </li>
-                                <li>
-                                    <a href="form.html">
-                                        <i class="far fa-check-square"></i>Forms</a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="fas fa-calendar-alt"></i>Calendar</a>
-                                </li>
-                                <li>
-                                    <a href="map.html">
-                                        <i class="fas fa-map-marker-alt"></i>Maps</a>
-                                </li>
-                            </ul>
                         </li>
                     </ul>
                 </nav>
@@ -169,8 +134,8 @@
                                 <div class="setting-menu js-right-sidebar d-none d-lg-block">
                                     <div class="account-dropdown__body">
                                         <div class="account-dropdown__item">
-                                            <a href="#">
-                                                <i class="zmdi zmdi-account"></i>Account</a>
+                                            <a href="{{ path('admin_profile') }}">
+                                                <i class="fas fa-user"></i>Profile</a>
                                         </div>
                                         <div class="account-dropdown__item">
                                             <a href="#">
@@ -214,7 +179,7 @@
                 <div class="menu-sidebar2__content js-scrollbar2">
                     <div class="account2">
                         <div class="image img-cir img-120">
-                            <img src="{{ asset('images/icon/avatar-big-01.jpg') }}" alt="John Doe" />
+                            <img src="/uploads/user_avatars/{{ app.user.photo }}" alt="{{ app.user.username }} photo" />
                         </div>
                         <h4 class="name">john doe</h4>
                         <a href="#">Sign out</a>
@@ -232,34 +197,40 @@
                                 <span class="inbox-num">3</span>
                             </li>
                             <li>
-                                <a href="#">
-                                    <i class="fas fa-shopping-basket"></i>eCommerce</a>
+                                <a href="{{ path('admin_users') }}">
+                                    <i class="fas fa-user"></i>Users</a>
                             </li>
-                            <li class="has-sub">
-                                <a class="js-arrow" href="#">
-                                    <i class="fas fa-trophy"></i>Features
-                                    <span class="arrow">
-                                        <i class="fas fa-angle-down"></i>
-                                    </span>
-                                </a>
-                                <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                    <li>
-                                        <a href="table.html">
-                                            <i class="fas fa-table"></i>Tables</a>
-                                    </li>
-                                    <li>
-                                        <a href="form.html">
-                                            <i class="far fa-check-square"></i>Forms</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <i class="fas fa-calendar-alt"></i>Calendar</a>
-                                    </li>
-                                    <li>
-                                        <a href="map.html">
-                                            <i class="fas fa-map-marker-alt"></i>Maps</a>
-                                    </li>
-                                </ul>
+                            <li>
+                                <a href="{{ path('admin_user_groups') }}">
+                                    <i class="fas fa-users"></i>User Groups</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('admin_subjects') }}">
+                                    <i class="fas fa-indent"></i>Subjects</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('admin_levels') }}">
+                                    <i class="fas fa-align-right"></i>Levels</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('admin_questions') }}">
+                                    <i class="fas fa-list-alt"></i>Questions</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('admin_exams') }}">
+                                    <i class="fas fa-book"></i>Exam</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('admin_account_types') }}">
+                                    <i class="fas fa-thumb-tack"></i>Account Types</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('admin_notifications') }}">
+                                    <i class="fas fa-bell"></i>Notifications</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('admin_profile') }}">
+                                <i class="fas fa-user"></i>Profile</a>
                             </li>
                         </ul>
                     </nav>

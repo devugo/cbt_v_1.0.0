@@ -109,6 +109,7 @@ class AccountTypeController extends AbstractController
         ->setLevelsPrivileges($content['levelsPrivileges'])
         ->setAccountTypesPrivileges($content['accountTypesPrivileges'])
         ->setUserGroupsPrivileges($content['userGroupsPrivileges'])
+        ->setExamsPrivileges($content['examsPrivileges'])
         ->setCreatedBy($this->getUser())
         ;
 
@@ -187,6 +188,7 @@ class AccountTypeController extends AbstractController
         ->setLevelsPrivileges($content['levelsPrivileges'])
         ->setAccountTypesPrivileges($content['accountTypesPrivileges'])
         ->setUserGroupsPrivileges($content['userGroupsPrivileges'])
+        ->setExamsPrivileges($content['examsPrivileges'])
         ->setUpdatedAt(new \DateTimeImmutable())
         ;
 

@@ -8,3 +8,7 @@ api_platform:
     collection:
         pagination:
             client_enabled: true
+            enabled_parameter_name: pagination
+    eager_loading:
+        force-eager: false
+        max_joins: 100

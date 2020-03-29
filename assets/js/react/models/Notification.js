@@ -1,5 +1,5 @@
 class Notification {
-    constructor(id, iri, sentBy, sentTo, title, message, actionLink, seenAt, createdAtAgo, updatedAtAgo ){
+    constructor(id, iri, sentBy, sentTo, title, message, actionLink, seenAtAgo, createdAtAgo, updatedAtAgo ){
         this.id = id;
         this.iri = iri;
         this.sentBy = sentBy;

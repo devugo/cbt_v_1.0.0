@@ -1,5 +1,5 @@
 class User {
-    constructor(id, iri, photo, name, email, username, dob, sex, accountType, createdAtAgo, updatedAtAgo, status, firstname, lastname, othernames ){
+    constructor(id, iri, photo, name, email, username, dob, sex, accountType, createdAtAgo, updatedAtAgo, status, firstname, lastname, othernames, mobile, userGroup ){
         this.id = id;
         this.iri = iri;
         this.photo = photo;
@@ -15,6 +15,8 @@ class User {
         this.firstname = firstname;
         this.lastname = lastname;
         this.othernames = othernames;
+        this.mobile = mobile;
+        this.userGroup = userGroup;
     }
 }
 

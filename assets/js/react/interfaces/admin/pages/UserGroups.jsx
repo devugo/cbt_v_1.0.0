@@ -27,7 +27,8 @@ const emptyFormData = {
     title: '',
     description: '',
     cost: 0,
-    daysValidity: 0
+    daysValidity: 0,
+    noOfExams: 0
 };
 
 const clearErrors = {
@@ -137,11 +138,14 @@ const UserGroups = () => {
 
     const getSingleUserGroup = useCallback((val, data) => {
         let userGroup = data.find(userGrp => userGrp.id === val);
-
+        
         setFormData({
             ...formData,
             title: userGroup.title,
-            description: userGroup.description
+            description: userGroup.description,
+            cost: userGroup.cost,
+            daysValidity: userGroup.daysValidity,
+            noOfExams: userGroup.noOfExams
         });
        
     }, [formData, setFormData]);
@@ -254,7 +258,6 @@ const UserGroups = () => {
             setFormData(emptyFormData);
             setImgUrl();
         }catch (error){
-            console.log(error.response);
             if(error.response.data && error.response.data.errors){
                 let serverErrors = JSON.parse(error.response.data.errors);
                 if(serverErrors["hydra:title"]){
@@ -285,7 +288,6 @@ const UserGroups = () => {
         try {
             await dispatch(UserGroupsActions.read(page));
         } catch(error) {
-            console.log(error.response);
             Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
             setErrors(clearErrors);
         }
@@ -342,6 +344,7 @@ const UserGroups = () => {
                         <td>{userGrp.description}</td>
                         <td>{userGrp.cost}</td>
                         <td>{userGrp.daysValidity}</td>
+                        <td>{userGrp.noOfExams}</td>
                         <td><Tag color="cyan">{userGrp.createdAtAgo}</Tag></td>
                         <td>
                             {
@@ -439,6 +442,7 @@ const UserGroups = () => {
                                                 <th>Description</th>
                                                 <th>Cost</th>
                                                 <th>Days Validity <br />(0 = Unlimited)</th>
+                                                <th>No Of Exams <br />(0 = Unlimited)</th>
                                                 <th>Created</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
@@ -536,6 +540,20 @@ const UserGroups = () => {
                         </div>
                         <div className="col-lg-6 col-md-6">
                             <div className="form-group">
+                                <label htmlFor="noOfExams">No of Exams</label>
+                                <TextInput name="noOfExams" id="noOfExams"
+                                    type="number"
+                                    value={formData.noOfExams}
+                                    onChange={changeFormData}
+                                    min={0}
+                                />
+                                <small>No of exams to be taken by user under this group. Leave zero for unlimited exam</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-lg-12 col-md-12">
+                            <div className="form-group">
                                 <label htmlFor="description">Description</label>
                                 <TextInput name="description" id="description" multiline
                                     row={4}
@@ -565,6 +583,7 @@ const UserGroups = () => {
                                     onChange={changeFormData}
                                     min={0}
                                 />
+                                <small>No of days to take exam by user under in this group. Leave zero for unlimited time</small>
                             </div>
                         </div>
                     </div>

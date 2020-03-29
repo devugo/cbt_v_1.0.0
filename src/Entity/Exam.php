@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
@@ -33,6 +34,7 @@ class Exam
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"exam:read"})
      */
     private $id;
 
@@ -55,13 +57,13 @@ class Exam
     private $description;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="string", length=20, nullable=true)
      * @Groups({"exam:read", "exam:write"})
      */
     private $startFrom;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="string", length=20, nullable=true)
      * @Groups({"exam:read", "exam:write"})
      */
     private $endAfter;
@@ -97,7 +99,7 @@ class Exam
     private $wrongAnswerScore;
 
     /**
-     * @ORM\Column(type="json", nullable=true)
+     * @ORM\Column(type="string", length=20, nullable=true)
      * @Groups({"exam:read", "exam:write"})
      */
     private $allowedIpAddresses = [];
@@ -145,12 +147,6 @@ class Exam
      * @ORM\JoinColumn(nullable=false)
      */
     private $createdBy;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"exam:read", "exam:write"})
-     */
-    private $addQuestions;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -202,10 +198,35 @@ class Exam
      */
     private $isActiveActionAt;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\ExamType", inversedBy="exams")
+     * @Groups({"exam:read", "exam:write"})
+     */
+    private $examType;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"exam:read", "exam:write"})
+     */
+    private $addQuestions;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"exam:read", "exam:write"})
+     */
+    private $startTime;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"exam:read", "exam:write"})
+     */
+    private $endTime;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->isActiveActionAt = new \DateTimeImmutable();
         $this->groups = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
@@ -239,24 +260,24 @@ class Exam
         return $this;
     }
 
-    public function getStartFrom(): ?\DateTimeInterface
+    public function getStartFrom(): ?string
     {
         return $this->startFrom;
     }
 
-    public function setStartFrom(?\DateTimeInterface $startFrom): self
+    public function setStartFrom(?string $startFrom): self
     {
         $this->startFrom = $startFrom;
 
         return $this;
     }
 
-    public function getEndAfter(): ?\DateTimeInterface
+    public function getEndAfter(): ?string
     {
         return $this->endAfter;
     }
 
-    public function setEndAfter(?\DateTimeInterface $endAfter): self
+    public function setEndAfter(?string $endAfter): self
     {
         $this->endAfter = $endAfter;
 
@@ -323,12 +344,12 @@ class Exam
         return $this;
     }
 
-    public function getAllowedIpAddresses(): ?array
+    public function getAllowedIpAddresses(): ?string
     {
         return $this->allowedIpAddresses;
     }
 
-    public function setAllowedIpAddresses(?array $allowedIpAddresses): self
+    public function setAllowedIpAddresses(?string $allowedIpAddresses): self
     {
         $this->allowedIpAddresses = $allowedIpAddresses;
 
@@ -435,18 +456,6 @@ class Exam
         return $this;
     }
 
-    public function getAddQuestions(): ?string
-    {
-        return $this->addQuestions;
-    }
-
-    public function setAddQuestions(?string $addQuestions): self
-    {
-        $this->addQuestions = $addQuestions;
-
-        return $this;
-    }
-
     public function getPrice(): ?int
     {
         return $this->price;
@@ -495,7 +504,7 @@ class Exam
      */
     public function getCreatedAtAgo()
     {
-        return $this->createdAt;
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function setCreatedAt(\DateTimeInterface $createdAt): self
@@ -517,7 +526,7 @@ class Exam
     */
    public function getUpdatedAtAgo()
    {
-       return $this->updateddAt;
+        return Carbon::instance($this->getUpdatedAt())->diffForHumans();
    }
 
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
@@ -551,12 +560,60 @@ class Exam
      */
     public function getIsActiveActionAtAgo()
     {
-        return $this->isActiveActionAt;
+        return Carbon::instance($this->getIsActiveActionAt())->diffForHumans();
     }
 
     public function setIsActiveActionAt(?\DateTimeInterface $isActiveActionAt): self
     {
         $this->isActiveActionAt = $isActiveActionAt;
+
+        return $this;
+    }
+
+    public function getExamType(): ?ExamType
+    {
+        return $this->examType;
+    }
+
+    public function setExamType(?ExamType $examType): self
+    {
+        $this->examType = $examType;
+
+        return $this;
+    }
+
+    public function getAddQuestions(): ?bool
+    {
+        return $this->addQuestions;
+    }
+
+    public function setAddQuestions(?bool $addQuestions): self
+    {
+        $this->addQuestions = $addQuestions;
+
+        return $this;
+    }
+
+    public function getStartTime(): ?string
+    {
+        return $this->startTime;
+    }
+
+    public function setStartTime(?string $startTime): self
+    {
+        $this->startTime = $startTime;
+
+        return $this;
+    }
+
+    public function getEndTime(): ?string
+    {
+        return $this->endTime;
+    }
+
+    public function setEndTime(?string $endTime): self
+    {
+        $this->endTime = $endTime;
 
         return $this;
     }

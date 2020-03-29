@@ -1,4 +1,4 @@
-import { READ_NOTIFICATIONS, CREATE_NOTIFICATION, DELETE_NOTIFICATION, UPDATE_NOTIFICATION } from '../actions/notifications';
+import { READ_NOTIFICATIONS, CREATE_NOTIFICATION, DELETE_NOTIFICATION, UPDATE_NOTIFICATION, MARK_NOTIFICATION } from '../actions/notifications';
 import Notification from '../../models/Notification';
 
 const initialState = {
@@ -14,21 +14,23 @@ export default (state = initialState, action) => {
                 count: action.count
             };
         case CREATE_NOTIFICATION:
-            const newNotification = new Notification(
-                action.data.id, 
-                action.data['@id'], 
-                action.data.sentBy, 
-                action.data.sentTo, 
-                action.data.title, 
-                action.data.message, 
-                action.data.actionLink, 
-                action.data.seenAt,
-                action.data.createdAtAgo,
-                action.data.updatedAtAgo
-            );
+            const newNotifications = action.data.map(noti => {
+                return new Notification(
+                    noti.id, 
+                    noti['@id'], 
+                    noti.sentBy, 
+                    noti.sentTo, 
+                    noti.title, 
+                    noti.message, 
+                    noti.actionLink, 
+                    noti.seenAtAgo,
+                    noti.createdAtAgo,
+                    noti.updatedAtAgo
+                );
+            });
             return {
                 ...state,
-                data: state.data.concat(newNotification),
+                data: state.data.concat(newNotifications),
                 count: state.count++
             }
         case DELETE_NOTIFICATION:
@@ -48,7 +50,7 @@ export default (state = initialState, action) => {
                 action.data.title, 
                 action.data.message, 
                 action.data.actionLink, 
-                action.data.seenAt,
+                action.data.seenAtAgo,
                 action.data.createdAtAgo,
                 action.data.updatedAtAgo
             );
@@ -59,6 +61,28 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 data: notifications
+            }
+        case MARK_NOTIFICATION:
+            const existingNotifications = state.data;
+            const markedNotification = new Notification(
+                action.data.id, 
+                action.data['@id'], 
+                action.data.sentBy, 
+                action.data.sentTo, 
+                action.data.title, 
+                action.data.message, 
+                action.data.actionLink, 
+                action.data.seenAtAgo,
+                action.data.createdAtAgo,
+                action.data.updatedAtAgo
+            );
+            const markedNotificationIndex = existingNotifications.findIndex(notification => notification.id === markedNotification.id);
+
+            existingNotifications[markedNotificationIndex] = markedNotification;
+
+            return {
+                ...state,
+                data: existingNotifications
             }
     }
     return state;

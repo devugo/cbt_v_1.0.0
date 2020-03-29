@@ -117,6 +117,12 @@ class AccountType
      */
     private $userGroupsPrivileges = [];
 
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     * @Groups({"account_type:read", "account_type:write"})
+     */
+    private $examsPrivileges = [];
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -320,6 +326,18 @@ class AccountType
     public function setUserGroupsPrivileges(?array $userGroupsPrivileges): self
     {
         $this->userGroupsPrivileges = $userGroupsPrivileges;
+
+        return $this;
+    }
+
+    public function getExamsPrivileges(): ?array
+    {
+        return $this->examsPrivileges;
+    }
+
+    public function setExamsPrivileges(?array $examsPrivileges): self
+    {
+        $this->examsPrivileges = $examsPrivileges;
 
         return $this;
     }

@@ -46,7 +46,7 @@ export const read = (page = 1, pagination = true) => {
             const resData = await response.data['hydra:member'];
             const totalData = await response.data['hydra:totalItems'];
 
-            let userGroupsData = resData.map(userGrp => new UserGroup(userGrp.id, userGrp['@id'], userGrp.title, userGrp.description, userGrp.cost, userGrp.daysValidity, userGrp.isActive, userGrp.createdBy, userGrp.createdAtAgo, userGrp.updatedAtAgo));
+            let userGroupsData = resData.map(userGrp => new UserGroup(userGrp.id, userGrp['@id'], userGrp.title, userGrp.description, userGrp.cost, userGrp.daysValidity, userGrp.isActive, userGrp.createdBy, userGrp.createdAtAgo, userGrp.updatedAtAgo, userGrp.noOfExams));
 
             dispatch({
                 type: READ_USER_GROUPS,

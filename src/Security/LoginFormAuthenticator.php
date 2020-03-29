@@ -67,6 +67,9 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
             'iri' => $this->iriConverter->getIriFromItem($userLoggedIn),
             'roles' => $userLoggedIn->getRoles(),
         ]);
+        // return new JsonResponse([
+        //     'user' => $this->serializer->serialize($userLoggedIn, 'jsonld')
+        // ]);
     }
 
     public function start(Request $request, AuthenticationException $authException = null)

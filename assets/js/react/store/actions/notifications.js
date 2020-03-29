@@ -6,7 +6,8 @@ import Notification from '../../models/Notification';
 export const READ_NOTIFICATIONS = 'READ_NOTIFICATIONS';
 export const CREATE_NOTIFICATION = 'CREATE_NOTIFICATION';
 export const DELETE_NOTIFICATION = 'DELETE_NOTIFICATION';
-export const UPDATE_NOTIFICATION = 'UPDATE_NOTIFICATION'
+export const UPDATE_NOTIFICATION = 'UPDATE_NOTIFICATION';
+export const MARK_NOTIFICATION = 'MARK_NOTIFICATION';
 
 export const create = (formData) => {
     return async (dispatch, getState) => {
@@ -20,7 +21,7 @@ export const create = (formData) => {
             });
             const resData = await response.data;
             
-            const notificationData = JSON.parse(resData.notification);
+            const notificationData = JSON.parse(resData.notifications);
             dispatch({
                 type: CREATE_NOTIFICATION,
                 data: notificationData
@@ -97,6 +98,28 @@ export const destroy = (iris) => {
                 data: iris
             });
         }catch (err){
+            throw err;
+        }
+    }
+}
+
+export const mark = (id) => {
+    return async (dispatch, getState) => {
+        try {
+            const response = await axios({
+                method: 'PUT',
+                url: `${ENV.HOST}/notification-api/mark/${id}`,
+                headers: ENV.HEADERS
+            });
+
+            const resData = await response.data;
+            
+            const notificationData = JSON.parse(resData.notification);
+            dispatch({
+                type: MARK_NOTIFICATION,
+                data: notificationData
+            });
+        }catch(err){
             throw err;
         }
     }
