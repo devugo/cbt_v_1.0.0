@@ -57,10 +57,8 @@ const Login = () => {
 
             if(userData.roles.indexOf('ROLE_ADMIN') != -1){
                 window.location.href = `${ENV.HOST}/admin`;
-            }else if(userData.roles.indexOf('ROLE_SCHOOL') != -1){
-                window.location.href = `${ENV.HOST}/school`;
             }else{
-                window.location.href = `${ENV.HOST}/teacher`;
+                window.location.href = `${ENV.HOST}/user`;
             }
         })
         .catch(error => {
@@ -77,7 +75,7 @@ const Login = () => {
         <div className="login-content">
             <div className="login-logo">
                 <a href="/">
-                    <img src={`${ENV.HOST}images/icon/logo.png`} alt="CoolAdmin" />
+                    <img src={`${ENV.HOST}uploads/site_images/devugo_logo.jpg`} width="70" alt="CoolAdmin" />
                 </a>
             </div>
             {
@@ -158,12 +156,12 @@ const Login = () => {
                         </div>
                     </div>
                 </form> */}
-                <div className="register-link">
+                {/* <div className="register-link">
                     <p>
                         Don't you have account?
                         <a href="#">Sign Up Here</a>
                     </p>
-                </div>
+                </div> */}
             </div>
         </div>
     );

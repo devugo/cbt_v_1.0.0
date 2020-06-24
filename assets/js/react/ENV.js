@@ -6,6 +6,7 @@ export const ITEMSPERPAGE = 10;
 export const RANGEDISPLAY = 5;
 export const ERRORTITLE = "Error!";
 export const ERRORDESC = "something went wrong";
+export const CURRENCY = 'NGN';
 
 export const HEADERS = {
     'content-type': 'application/ld+json',

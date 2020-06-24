@@ -108,6 +108,7 @@ class UserGroup
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Exam", mappedBy="groups")
+     * * @Groups({"user_group:read", "user:read"})
      */
     private $exams;
 

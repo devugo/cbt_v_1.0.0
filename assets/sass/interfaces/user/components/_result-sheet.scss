@@ -1,0 +1,65 @@
+.result {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+
+    &-card {
+        color: white;
+        background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url("../../../../images/result-bg.jpg") no-repeat center center fixed;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 50px;
+        width: 100%;
+        padding: 30px 0;
+
+        &__header {
+           text-align: center;
+
+           h2 {
+               color: orange;
+           }
+
+           h3, h4 {
+               color: white;
+           }
+        }
+
+        &__grade {
+            text-align: center;
+
+            &-col {
+                
+                P{
+                    font-size: 20px;
+
+                    &:nth-child(2) {
+                        color: orange;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.answer-sheet {
+    margin: 50px;
+}
+
+@media (min-width: 768px) {
+    .result {
+        &-card {
+            &__grade {
+                display: flex;
+                width: 100%;
+                justify-content: center;
+
+                &-col {
+                    display: flex;
+                    flex-direction: column;
+                    width: 14%;
+                }
+            }
+        }
+    }
+}

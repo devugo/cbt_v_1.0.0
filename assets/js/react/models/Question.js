@@ -1,5 +1,5 @@
 class Question {
-    constructor(id, iri, content, explanationText, explanationResource, noOfOptions, options, correctAnswers, questionType, subject, level, createdBy, createdAtAgo, updatedAtAgo ){
+    constructor(id, iri, content, explanationText, explanationResource, noOfOptions, options, correctAnswers, questionType, subject, level, createdBy, createdAtAgo, updatedAtAgo, exams, image ){
         this.id = id;
         this.iri = iri;
         this.content = content;
@@ -14,6 +14,8 @@ class Question {
         this.createdBy = createdBy;
         this.createdAtAgo = createdAtAgo;
         this.updatedAtAgo = updatedAtAgo;
+        this.exams = exams;
+        this.image = image;
     }
 }
 

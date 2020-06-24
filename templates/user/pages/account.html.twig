@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Devugo CBT - Account{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+
+    <div class="page-wrapper">
+        <!-- HEADER DESKTOP-->
+       {% include 'user/layout/desktop-header.html.twig' %}
+        <!-- END HEADER DESKTOP-->
+
+        <!-- HEADER MOBILE-->
+        {% include 'user/layout/mobile-header.html.twig' %}
+        <!-- END HEADER MOBILE -->
+
+        <!-- PAGE CONTENT-->
+        <div class="page-content--bgf7">
+            <!-- BREADCRUMB-->
+           {% include 'user/layout/breadcrumb.html.twig' with {'title': 'Account'} %}
+            <!-- END BREADCRUMB-->
+
+            <div id="user-profile"></div>
+
+            {% include 'user/layout/footer.html.twig' %}
+        </div>
+
+    </div>
+{% endblock %}

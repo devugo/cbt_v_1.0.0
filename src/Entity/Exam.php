@@ -22,9 +22,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      "pagination_items_per_page"=10
  *  }
  * )
- * @ApiFilter(BooleanFilter::class, properties={"isActive"})
+ * @ApiFilter(BooleanFilter::class, properties={"isActive", "addQuestions"})
  * @UniqueEntity(fields={"title"})
- * @ApiFilter(SearchFilter::class, properties={"title":"exact", "createdBy":"exact"})
+ * @ApiFilter(SearchFilter::class, properties={"title":"exact", "createdBy":"exact", "groups":"exact"})
  * @ORM\Table(name="exams")
  * @ORM\Entity(repositoryClass="App\Repository\ExamRepository")
  */
@@ -222,6 +222,41 @@ class Exam
      */
     private $endTime;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Question", inversedBy="exams")
+     * @Groups({"exam:read", "exam:write"})
+     */
+    private $questions;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"exam:read", "exam:write"})
+     */
+    private $shuffleQuestions;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"exam:read", "exam:write"})
+     */
+    private $shuffleOptions;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserExamQuestions", mappedBy="exam")
+     */
+    private $userExamQuestions;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ExamTaken", mappedBy="exam")
+     * @Groups({"exam:read"})
+     */
+    private $examTakens;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\PaidExam", mappedBy="exam")
+     * @Groups({"exam:read"})
+     */
+    private $paidExams;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -229,6 +264,10 @@ class Exam
         $this->isActiveActionAt = new \DateTimeImmutable();
         $this->groups = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->questions = new ArrayCollection();
+        $this->userExamQuestions = new ArrayCollection();
+        $this->examTakens = new ArrayCollection();
+        $this->paidExams = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -614,6 +653,149 @@ class Exam
     public function setEndTime(?string $endTime): self
     {
         $this->endTime = $endTime;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Question[]
+     */
+    public function getQuestions(): Collection
+    {
+        return $this->questions;
+    }
+
+    public function addQuestion(Question $question): self
+    {
+        if (!$this->questions->contains($question)) {
+            $this->questions[] = $question;
+        }
+
+        return $this;
+    }
+
+    public function removeQuestion(Question $question): self
+    {
+        if ($this->questions->contains($question)) {
+            $this->questions->removeElement($question);
+        }
+
+        return $this;
+    }
+
+    public function getShuffleQuestions(): ?bool
+    {
+        return $this->shuffleQuestions;
+    }
+
+    public function setShuffleQuestions(?bool $shuffleQuestions): self
+    {
+        $this->shuffleQuestions = $shuffleQuestions;
+
+        return $this;
+    }
+
+    public function getShuffleOptions(): ?bool
+    {
+        return $this->shuffleOptions;
+    }
+
+    public function setShuffleOptions(?bool $shuffleOptions): self
+    {
+        $this->shuffleOptions = $shuffleOptions;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserExamQuestions[]
+     */
+    public function getUserExamQuestions(): Collection
+    {
+        return $this->userExamQuestions;
+    }
+
+    public function addUserExamQuestion(UserExamQuestions $userExamQuestion): self
+    {
+        if (!$this->userExamQuestions->contains($userExamQuestion)) {
+            $this->userExamQuestions[] = $userExamQuestion;
+            $userExamQuestion->setExam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserExamQuestion(UserExamQuestions $userExamQuestion): self
+    {
+        if ($this->userExamQuestions->contains($userExamQuestion)) {
+            $this->userExamQuestions->removeElement($userExamQuestion);
+            // set the owning side to null (unless already changed)
+            if ($userExamQuestion->getExam() === $this) {
+                $userExamQuestion->setExam(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ExamTaken[]
+     */
+    public function getExamTakens(): Collection
+    {
+        return $this->examTakens;
+    }
+
+    public function addExamTaken(ExamTaken $examTaken): self
+    {
+        if (!$this->examTakens->contains($examTaken)) {
+            $this->examTakens[] = $examTaken;
+            $examTaken->setExam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExamTaken(ExamTaken $examTaken): self
+    {
+        if ($this->examTakens->contains($examTaken)) {
+            $this->examTakens->removeElement($examTaken);
+            // set the owning side to null (unless already changed)
+            if ($examTaken->getExam() === $this) {
+                $examTaken->setExam(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PaidExam[]
+     */
+    public function getPaidExams(): Collection
+    {
+        return $this->paidExams;
+    }
+
+    public function addPaidExam(PaidExam $paidExam): self
+    {
+        if (!$this->paidExams->contains($paidExam)) {
+            $this->paidExams[] = $paidExam;
+            $paidExam->setExam($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaidExam(PaidExam $paidExam): self
+    {
+        if ($this->paidExams->contains($paidExam)) {
+            $this->paidExams->removeElement($paidExam);
+            // set the owning side to null (unless already changed)
+            if ($paidExam->getExam() === $this) {
+                $paidExam->setExam(null);
+            }
+        }
 
         return $this;
     }

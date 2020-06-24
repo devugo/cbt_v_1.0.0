@@ -32,12 +32,12 @@ export const create = (formData) => {
     }
 }
 
-export const read = (page = 1, pagination = true) => {
+export const read = (page = 1, pagination = true, sentTo = null) => {
     return async (dispatch, getState) => {
         try {
             const response = await axios({
                 method: 'GET',
-                url: `${ENV.HOST}/api/notifications?page=${page}&pagination=${pagination}`,
+                url: `${ENV.HOST}/api/notifications?sentTo=${sentTo}&page=${page}&pagination=${pagination}`,
                 headers: ENV.HEADERS
             });
             if(response.status != 200){

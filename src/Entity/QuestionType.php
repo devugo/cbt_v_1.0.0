@@ -78,11 +78,17 @@ class QuestionType
      */
     private $questions;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserExamQuestions", mappedBy="QuestionType")
+     */
+    private $userExamQuestions;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->questions = new ArrayCollection();
+        $this->userExamQuestions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -183,6 +189,37 @@ class QuestionType
             // set the owning side to null (unless already changed)
             if ($question->getQuestionType() === $this) {
                 $question->setQuestionType(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserExamQuestions[]
+     */
+    public function getUserExamQuestions(): Collection
+    {
+        return $this->userExamQuestions;
+    }
+
+    public function addUserExamQuestion(UserExamQuestions $userExamQuestion): self
+    {
+        if (!$this->userExamQuestions->contains($userExamQuestion)) {
+            $this->userExamQuestions[] = $userExamQuestion;
+            $userExamQuestion->setQuestionType($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserExamQuestion(UserExamQuestions $userExamQuestion): self
+    {
+        if ($this->userExamQuestions->contains($userExamQuestion)) {
+            $this->userExamQuestions->removeElement($userExamQuestion);
+            // set the owning side to null (unless already changed)
+            if ($userExamQuestion->getQuestionType() === $this) {
+                $userExamQuestion->setQuestionType(null);
             }
         }
 

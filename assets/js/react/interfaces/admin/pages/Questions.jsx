@@ -2,12 +2,23 @@ import React, { useEffect, useCallback, useState, useRef} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Spin, Select, Button, Modal, Alert, Checkbox, Tag, Steps, Popconfirm, Popover, Upload, message, Tooltip, Input, Radio } from 'antd';
 import DeleteForeverSharpIcon from '@material-ui/icons/DeleteForeverSharp';
-import BluetoothSearchingIcon from '@material-ui/icons/BluetoothSearching';
 import Edit from '@material-ui/icons/Edit';
 import { LoadingOutlined } from '@ant-design/icons';
 import { ValidationForm, TextInput, SelectGroup, FileInput } from 'react-bootstrap4-form-validation';
 import Pagination from '@material-ui/lab/Pagination';
+import SelectMat from '@material-ui/core/Select';
+import Chip from '@material-ui/core/Chip';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import InputMat from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import MathJax from 'react-mathjax2'
 
+const ascii = 'U = 1/(R_(si) + sum_(i=1)^n(s_n/lambda_n) + R_(se))'
+
+import * as ExamsActions from '../../../store/actions/exams';
 import * as QuestionsActions from '../../../store/actions/questions';
 import * as QuestionTypesActions from '../../../store/actions/question-types';
 import * as SubjectsActions from '../../../store/actions/subjects';
@@ -20,8 +31,9 @@ import { Notification } from '../../../UIElements/Notification';
 import { Message } from '../../../UIElements/Message';
 import QuickConfirm from '../../../UIElements/QuickConfirm';
 
-
 import * as ENV from '../../../ENV';
+
+const { Option } = Select;
 
 const itemsPerPage = ENV.ITEMSPERPAGE;
 const rangeDisplay = ENV.RANGEDISPLAY;
@@ -30,6 +42,7 @@ const emptyFormData = {
     content: '',
     explanationText: '',
     explanationResource: '',
+    image: '',
     noOfOptions: '4',
     options: [],
     correctAnswers: [],
@@ -38,9 +51,16 @@ const emptyFormData = {
     level: ''
 };
 
+const emptySortData = {
+    questionType: '',
+    level: '',
+    subject: ''
+};
+
 const clearErrors = {
     title: '',
-    description: ''
+    description: '',
+    selectExam: ''
 };
 
 const loaders = {
@@ -53,10 +73,64 @@ let serverErrorDesc = ENV.ERRORDESC;
 
 const { Step } = Steps;
 
+const useStyles = makeStyles(theme => ({
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+      maxWidth: 300,
+    },
+    chips: {
+      display: 'flex',
+      flexWrap: 'wrap',
+    },
+    chip: {
+      margin: 2,
+    },
+    noLabel: {
+      marginTop: theme.spacing(3),
+    },
+    chipList: {
+      margin: theme.spacing(0.5),
+    },
+}));
+
 const Questions = () => {
 
-    const width = useWindowWidth();
+    const width = useWindowWidth();  const classes = useStyles();
+    const theme = useTheme();
+    const [sentTo, setSentTo] = React.useState([]);
 
+    const handleChange = useCallback((event) => {
+        // console.log(sentTo);
+        setSentTo(event.target.value);
+        setErrors({
+            ...errors,
+            selectExam: ''
+        });
+    }, [setSentTo, setErrors, errors]);
+
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+
+    const MenuProps = {
+        PaperProps: {
+          style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+          },
+        },
+    };
+
+    function getStyles(name, sentTo, theme) {
+        return {
+          fontWeight:
+            sentTo.indexOf(name) === -1
+              ? theme.typography.fontWeightRegular
+              : theme.typography.fontWeightMedium,
+        };
+    }
+
+    const exams = useSelector(state => state.exams.data);
     const questions = useSelector(state => state.questions.data);
     const subjects = useSelector(state => state.subjects.data);
     const levels = useSelector(state => state.levels.data);
@@ -72,8 +146,10 @@ const Questions = () => {
     const [errors, setErrors] = useState(clearErrors);
     const [openAddModal, setOpenAddModal] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [openAddQuestionModal, setOpenAddQuestionModal] = useState(false);
 
     const [formData, setFormData] = useState(emptyFormData);
+    const [sortData, setSortData] = useState(emptySortData);
     const [loading, setLoading] = useState(loaders);
     const [imgUrl, setImgUrl] = useState();
     const [filterMe, setFilterMe] = useState("");
@@ -132,7 +208,6 @@ const Questions = () => {
     }, []);
 
     const changeSelectCorrect = useCallback((x) => {
-        console.log(formData.correctAnswers);
         let correctAnswers = [...formData.correctAnswers];
         if(formData.questionType === '/api/question_types/1'){
             correctAnswers.map((x, index) => correctAnswers[index] = false);
@@ -145,6 +220,41 @@ const Questions = () => {
             correctAnswers: correctAnswers
         });
     }, [formData, setFormData]);
+
+    const onChangeSortQuestionType = useCallback((value) => {
+        setSortData({
+            ...sortData,
+            questionType: value
+        });
+    }, [sortData, setSortData]);
+
+    const onChangeSortLevel = useCallback((value) => {
+        setSortData({
+            ...sortData,
+            level: value
+        });
+    }, [sortData, setSortData]);
+
+    const onChangeSortSubject = useCallback((value) => {
+        setSortData({
+            ...sortData,
+            subject: value
+        });
+    }, [sortData, setSortData]);
+
+    const changeQuestionContent = useCallback((value) => {
+        setFormData({
+            ...formData,
+            content: value
+        })
+    }, [setFormData, formData]);
+
+    const changeQuestionExplanationText = useCallback((value) => {
+        setFormData({
+            ...formData,
+            explanationText: value
+        })
+    }, [setFormData, formData]);
 
     const changeFormData = useCallback((e) => {
         let name = e.target.name;
@@ -189,17 +299,17 @@ const Questions = () => {
                 options: newOpt
             })
         }
-        if(e.target.name == 'explanationResource') {
+        if(name == 'explanationResource' || name == 'image') {
             let fileContent = e.target.files[0];
 
             setFormData({
                 ...formData,
-                [e.target.name]: fileContent
+                [name]: fileContent
             });
         }else{
             setFormData({
                 ...formData,
-                [e.target.name]: e.target.value
+                [name]: e.target.value
             });
         }
         
@@ -219,15 +329,32 @@ const Questions = () => {
         setOpenDeleteModal(true);
     }, [setIdToDelete, setValues, setOpenDeleteModal]);
 
+    
+    const handleDelete = (exam, question) => () => {
+
+        removeExamFromQuestion(exam, question);
+        getQuestions();
+       
+    };
+
+    const removeExamFromQuestion = useCallback(async (exam, question) => {
+        try {
+            await dispatch(QuestionsActions.removeFromExam({exam: exam, question: question}));
+            Message('success', 'Question was removed from exam successfully', 5);
+        }catch (error){
+            Message('error', 'There was an error removing question from exam', 5);
+        }
+    }, [dispatch]);
+
     const getSingleQuestion = useCallback((val, data) => {
         let question = data.find(question => question.id === val);
-        console.log(question);
 
         setFormData({
             ...formData,
             content: question.content,
             explanationText: question.explanationText,
             explanationResource: question.explanationResource,
+            image: question.image,
             noOfOptions: question.noOfOptions,
             options: question.options,
             correctAnswers: question.correctAnswers,
@@ -237,6 +364,50 @@ const Questions = () => {
         });
        
     }, [formData, setFormData]);
+
+    const addQuestionsToExam = useCallback(async (e) => {
+        e.preventDefault();
+
+        if(sentTo.length < 1){
+            // return;
+            return setErrors({
+                ...errors,
+                selectExam: 'Please, select atleast one exam'
+            });
+        }
+        setLoading({
+            ...loading,
+            action: true
+        });
+        setErrors(clearErrors);
+        
+        try {
+            await dispatch(QuestionsActions.addToExams({questions: values, exams: sentTo.map(exam => exam.iri)}));
+            Message('success', 'Questions were added to exams successfully', 5);
+            setSentTo([]);
+            setValues([]);
+            setGlobal(false);
+        }catch (error){
+            if(error.response.data && error.response.data.errors){
+                let serverErrors = JSON.parse(error.response.data.errors);
+                if(serverErrors["hydra:title"]){
+                    serverErrorTitle = serverErrors["hydra:title"];
+                    serverErrorDesc = serverErrors["hydra:description"];
+                }else{
+                    serverErrorDesc = serverErrors
+                }
+            }
+            setErrors({
+                title: serverErrorTitle,
+                description: serverErrorDesc
+            });
+        }
+
+        setLoading({
+            ...loading, 
+            action: false
+        });
+    }, [sentTo, setErrors, errors, setLoading, loading, values, ]);
 
     const deleteQuestion = useCallback(async (e) => {
         e.preventDefault();
@@ -292,6 +463,7 @@ const Questions = () => {
         form.append('subject', formData.subject);
         form.append('level', formData.level);
         form.append('explanationResource', formData.explanationResource);
+        form.append('image', formData.image);
 
         try {
             await dispatch(QuestionsActions.update(idToEdit, form));
@@ -330,7 +502,6 @@ const Questions = () => {
             action: true
         });
         setErrors(clearErrors);
-        console.log(formData);
 
         const form = new FormData();
         form.append('content', formData.content);
@@ -342,6 +513,7 @@ const Questions = () => {
         form.append('subject', formData.subject);
         form.append('level', formData.level);
         form.append('explanationResource', formData.explanationResource);
+        form.append('image', formData.image);
 
         try {
             await dispatch(QuestionsActions.create(form));
@@ -350,8 +522,6 @@ const Questions = () => {
             setImgUrl();
             setCurrentStep(1);
         }catch (error){
-            console.log(error.response);
-            console.log(error.message);
             if(error.response.data && error.response.data.errors){
                 let serverErrors = JSON.parse(error.response.data.errors);
                 if(serverErrors["hydra:title"]){
@@ -373,15 +543,14 @@ const Questions = () => {
         });
     }, [formData, dispatch, setLoading, loading, setErrors, errors, setFormData, setImgUrl]);
 
-    const getQuestions = useCallback(async (page = 1) => {
+    const getQuestions = useCallback(async (page = 1, pagination = true, questionType = sortData.questionType, subject = sortData.subject, level = sortData.level) => {
         setLoading({
             ...loading,
             content: true
         });
 
         try {
-            await dispatch(QuestionsActions.read(page));
-            console.log('first');
+            await dispatch(QuestionsActions.read(page, pagination, questionType, subject, level));
         } catch(error) {
             Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
             setErrors(clearErrors);
@@ -390,13 +559,12 @@ const Questions = () => {
             ...loading,
             content: false
         });
-    }, [dispatch, setLoading, loading, setErrors, Notification]);
+    }, [dispatch, setLoading, loading, setErrors, Notification, sortData]);
     
     const getQuestionTypes = useCallback(async (page = 1, pagination = false) => {
 
         try {
             await dispatch(QuestionTypesActions.read(page, pagination));
-            console.log('second');
         } catch(error) {
             Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
         }
@@ -406,7 +574,6 @@ const Questions = () => {
 
         try {
             await dispatch(LevelsActions.read(page, pagination));
-            console.log('third');
         } catch(error) {
             Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
         }
@@ -416,7 +583,15 @@ const Questions = () => {
 
         try {
             await dispatch(SubjectsActions.read(page, pagination));
-            console.log('fourth');
+        } catch(error) {
+            Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
+        }
+    }, [dispatch, Notification]);
+
+    const getExams = useCallback(async (page = 1, pagination = false) => {
+
+        try {
+            await dispatch(ExamsActions.read(page, pagination, null, null));
         } catch(error) {
             Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
         }
@@ -444,10 +619,10 @@ const Questions = () => {
     
     const renderTableData = () => {
         if (!filteredQuestions){
-            return <tr className="text-center"><td colSpan={9}><Spin /></td></tr>
+            return <tr className="text-center"><td colSpan={10}><Spin /></td></tr>
         }
         if(filteredQuestions.length === 0){
-            return <tr className="text-center"><td colSpan={9}><strong><i>No record found!</i></strong></td></tr>
+            return <tr className="text-center"><td colSpan={10}><strong><i>No record found!</i></strong></td></tr>
         }
         return filteredQuestions.map((question, index) => {
             let checker = isChecked(question.iri);
@@ -469,11 +644,28 @@ const Questions = () => {
                         <td>{subjects && subjects.length > 0 && (subjects.find(sub => sub.iri === question.subject)).title}</td>
                         <td>{levels && levels.length > 0 && (levels.find(lev => lev.iri === question.level)).title}</td>
                         <td>{question.content}</td>
+                        <td>
+                            { 
+                                exams && exams.length > 0 &&
+                                question.exams.map((exam, index) => (
+                                    <Chip
+                                        key={index}
+                                        label={exams.find(exm => exm.iri === exam).title}
+                                        onDelete={handleDelete(exam, question.iri)}
+                                        className={classes.chipList}
+                                        size="small"
+                                        color="primary"
+                                    />
+                                    )
+                                )
+                            }
+                        </td>
                         <td className="text-center">{question.explanationResource ? <span style={{display: 'flex', justifyContent: 'space-around'}}><i style={{color: 'green'}} className="fa fa-check-circle"></i><Tooltip placement="top" title="View attachment"><a target="_blank" href={`/ViewerJS/#../uploads/explanation_resources/${question.explanationResource}`} ><i style={{color: 'orange', cursor: 'pointer'}} className="fa fa-eye"></i></a></Tooltip></span> : <i style={{color: 'red'}} className="fa fa-times"></i>}</td>
                         <td><Tag color="cyan">{question.createdAtAgo}</Tag></td>
                         <td>
                             <Tooltip placement="top" title="Edit question"><Edit onClick={() => changeEditContent(question.id, questions)} style={{cursor: "pointer"}} color="primary" /></Tooltip>
                             <Tooltip placement="top" title="Delete question"><DeleteForeverSharpIcon onClick={()=>changeContent(question.iri)} style={{cursor: "pointer"}} color="secondary" /></Tooltip>
+                            
                         </td>
                     </tr>
                     <tr className="spacer"></tr>
@@ -486,7 +678,6 @@ const Questions = () => {
         let options = [];
         let optionsArr = [];
         let correctAnswersArr = [];
-        console.log(formData);
 
         // check to be sure atleast two options for question was selected
         if(formData.noOfOptions > 1){
@@ -518,11 +709,15 @@ const Questions = () => {
     }, [formData, setFormData, options, setOptions]);
 
     useEffect(() => {
-        getQuestions();
         getQuestionTypes();
         getLevels();
         getSubjects();
+        getExams();
     }, []);
+
+    useEffect(() => {
+        getQuestions();
+    }, [sortData]);
 
     // const { noOfOptions, questionType } = formData;
     useEffect(() => {
@@ -532,11 +727,6 @@ const Questions = () => {
     useEffect(() => {
         setFilteredQuestions(questions);
     }, [questions]);
-
-    console.log(editModeChecker);
-    console.log(formData);
-    console.log(options);
-    console.log(formData.correctAnswers);
 
     return (
         <>
@@ -550,10 +740,66 @@ const Questions = () => {
                         <h3 className="title-5 m-b-35">Questions</h3>
                         {
                             loading.content ?
-                            <div className="text-center"><LoadingOutlined style={{color: 'blue'}} /></div> :
+                            <div className="text-center"><LoadingOutlined style={{color: 'blue', fontSize: 50}} /></div> :
                             <>
-                                <div className="col-lg-3 col-md-4">
-                                    <Input placeholder="Search question..." allowClear value={filterMe} onChange={changeFilteredMe} />
+                                <div className="row">
+                                    <div className="col-lg-1 col-md-1">
+                                        Filter:
+                                    </div>
+                                    <div className="col-lg-8 col-md-8"> 
+                                        <div style={{width: '100%', display: 'flex'}}>
+                                            <div style={{width: '33%'}}>
+                                                <Select
+                                                    showSearch
+                                                    style={{width: 200}}
+                                                    placeholder="Filter by question type"
+                                                    optionFilterProp="children"
+                                                    onChange={onChangeSortQuestionType}
+                                                    value={sortData.questionType}
+                                                >
+                                                    <Option value="">All Question types</Option>
+                                                    {
+                                                        questionTypes && questionTypes.length > 0 && questionTypes.map((qType, index) => <Option key={index} value={qType.iri}>{qType.title}</Option>)
+                                                    }
+                                                </Select>
+                                            </div>
+                                            <div style={{width: '33%'}}>
+                                                <Select
+                                                    showSearch
+                                                    style={{width: 200}}
+                                                    placeholder="Filter by subject"
+                                                    optionFilterProp="children"
+                                                    onChange={onChangeSortSubject}
+                                                    value={sortData.subject}
+                                                >
+                                                    <Option value="">All Subjects</Option>
+                                                    {
+                                                        subjects && subjects.length > 0 && subjects.map((subject, index) => <Option key={index} value={subject.iri}>{subject.title}</Option>)
+                                                    }
+                                                </Select>
+                                            </div>
+                                            <div style={{width: '33%'}}>
+                                                <Select
+                                                    showSearch
+                                                    style={{width: 200}}
+                                                    placeholder="Filter by level"
+                                                    optionFilterProp="children"
+                                                    onChange={onChangeSortLevel}
+                                                    value={sortData.level}
+                                                >
+                                                    <Option value="">All Levels</Option>
+                                                    {
+                                                        levels && levels.length > 0 && levels.map((level, index) => <Option key={index} value={level.iri}>{level.title}</Option>)
+                                                    }
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br />
+                                <div className="row">
+                                    <div className="col-lg-3 col-md-4">
+                                        <Input placeholder="Search question..." allowClear value={filterMe} onChange={changeFilteredMe} />
+                                    </div>
                                 </div>
                                 <div className="table-responsive table-responsive-data2">
                                     <table className="table table-data2">
@@ -566,12 +812,26 @@ const Questions = () => {
                                                         {
                                                         loading.action ? 
                                                             <LoadingOutlined style={{color: 'blue'}} /> :
-                                                            <Tooltip placement="top" title="Delete multiple account types">
+                                                            <Tooltip placement="top" title="Delete multiple questions">
                                                                 <QuickConfirm
                                                                     title="Delete All?"
                                                                     color="red"
                                                                     tagName="Delete"
                                                                     ok={deleteQuestion}
+                                                                />
+                                                            </Tooltip>
+                                                        } 
+                                                    </th>
+                                                    <th>
+                                                        {
+                                                        loading.action ? 
+                                                            <LoadingOutlined style={{color: 'blue'}} /> :
+                                                            <Tooltip placement="top" title="Add questions to exam">
+                                                                <QuickConfirm
+                                                                    title="Add questions to exam?"
+                                                                    color="green"
+                                                                    tagName="Add"
+                                                                    ok={() => setOpenAddQuestionModal(true)}
                                                                 />
                                                             </Tooltip>
                                                         } 
@@ -591,6 +851,7 @@ const Questions = () => {
                                                 <th>Subject</th>
                                                 <th>Level</th>
                                                 <th>Content</th>
+                                                <th>Exams in</th>
                                                 <th>Explanation Resource</th>
                                                 <th>Created</th>
                                                 <th>Action</th>
@@ -652,6 +913,68 @@ const Questions = () => {
                     }
                     
                 </div>
+            </Modal>
+
+            <Modal
+                title="Add questions to exams"
+                centered
+                visible={openAddQuestionModal}
+                onCancel={() => {setOpenAddQuestionModal(false); setValues([])}}
+                footer={null}
+                zIndex={1000}
+                width={width > 1024 ? '70%' : width > 768 ? '80%' : width > 360 ? '90%' : '100%'}
+            >
+                {
+                    errors.description &&
+                    <Alert 
+                        className="text-center"
+                        message={errors.title}
+                        description={errors.description}
+                        type="error"
+                        closable
+                        onClose={onClose}
+                    />
+                }
+                <ValidationForm onSubmit={addQuestionsToExam}>
+                    <div className="row">
+                        <div className="col-lg-12">
+                            <small><span style={{color: 'blue'}}><strong>NB:</strong></span> Questions can only be added to exams that are set to add questions manually</small><br />
+                            <InputLabel id="demo-mutiple-chip-label">Select Exams</InputLabel>
+                            {
+                                exams.length > 0 ? 
+                                <SelectMat
+                                    style={{width: '100%'}}
+                                    labelId="demo-mutiple-chip-label"
+                                    id="demo-mutiple-chip"
+                                    multiple
+                                    value={sentTo}
+                                    onChange={handleChange}
+                                    input={<InputMat id="select-multiple-chip" />}
+                                    renderValue={selected => (
+                                        <div className={classes.chips}>
+                                        {selected.map(value => (
+                                            <Chip key={value.title} label={value.title} className={classes.chip} />
+                                        ))}
+                                        </div>
+                                    )}
+                                    MenuProps={MenuProps}
+                                    >
+                                    {exams.filter(exm => !exm.addQuestions).map(exam => (
+                                        <MenuItem key={exam.id} value={exam} style={getStyles(exam, sentTo, theme)}>
+                                        {exam.title}
+                                        </MenuItem>
+                                    ))}
+                                </SelectMat>
+                                :
+                                <div> No exam available for this option</div>
+                            }
+                            {sentTo.length < 1 && <small style={{color: 'red'}}>{errors.selectExam}</small>}
+                        </div>
+                    </div>
+                    <div className="form-group float-right">
+                        <button disabled={loading.action} className="btn btn-login">{ loading.action ? <><span>Sending</span> <Spin /></> : "Add" }</button>
+                    </div>
+                </ValidationForm><br /><br />
             </Modal>
             
             <Modal
@@ -768,12 +1091,26 @@ const Questions = () => {
                                 <div className="col-lg-12 col-md-12">
                                     <div className="form-group">
                                         <label htmlFor="content">Question Content</label>
-                                        <TextInput name="content" id="content" multiline 
-                                            row={5}
-                                            required
-                                            errorMessage="Please enter question content"
-                                            value={formData.content}
+                                        <ReactQuill value={formData.content}
+                                            onChange={changeQuestionContent} 
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-lg-12 col-md-12">
+                                    <div className="form-group">
+                                        <label htmlFor="image">Question image if any</label>
+                                        <FileInput name="image" id="image"
                                             onChange={changeFormData}
+                                            fileType={["jpg", "jpeg", "png", "gif"]}
+                                            maxFileSize="500 kb"
+                                            errorMessage={
+                                                {
+                                                    fileType: "Only jpg, jpeg, png and gif file type asre allowed",
+                                                    maxFileSize: "Max file size is 500 kb"
+                                                }
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -782,10 +1119,8 @@ const Questions = () => {
                                 <div className="col-lg-12 col-md-12">
                                     <div className="form-group">
                                         <label htmlFor="explanationText">Question explanation text</label>
-                                        <TextInput name="explanationText" id="explanationText" multiline
-                                            row={5}
-                                            value={formData.explanationText}
-                                            onChange={changeFormData}
+                                        <ReactQuill value={formData.explanationText}
+                                            onChange={changeQuestionExplanationText} 
                                         />
                                     </div>
                                 </div>
@@ -794,7 +1129,7 @@ const Questions = () => {
                                 <div className="col-lg-12 col-md-12">
                                     <div className="form-group">
                                         <label htmlFor="explanationResource">Additional question explanation resource</label>
-                                        <FileInput name="explanationResource" id="attachment"
+                                        <FileInput name="explanationResource" id="explanationResource"
                                             onChange={changeFormData}
                                             fileType={["pdf", "doc", "docx", "xls", "xlsx"]}
                                             maxFileSize="500 kb"

@@ -1,4 +1,4 @@
-class Subject {
+class UserGroup {
     constructor(id, iri, title, description, cost, daysValidity, status, createdBy, createdAtAgo, updatedAtAgo, noOfExams ){
         this.id = id;
         this.iri = iri;
@@ -14,4 +14,4 @@ class Subject {
     }
 }
 
-export default Subject;
+export default UserGroup;

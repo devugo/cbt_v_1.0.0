@@ -12,11 +12,11 @@ export default (state = initialState, action) => {
     switch(action.type){
         case READ_USERS:
             return {
+                ...state,
                 data: action.data,
                 count: action.count
             };
         case GET_AUTH_USER:
-            console.log(state);
             return {
                 ...state,
                 auth: action.data
@@ -39,7 +39,9 @@ export default (state = initialState, action) => {
                 action.data.lastname,
                 action.data.othernames,
                 action.data.mobile,
-                action.data.userGroup
+                action.data.userGroup,
+                action.data.paidExams,
+                action.data.examTakens
             );
             return {
                 ...state,
@@ -72,7 +74,9 @@ export default (state = initialState, action) => {
                 action.data.lastname,
                 action.data.othernames,
                 action.data.mobile,
-                action.data.userGroup
+                action.data.userGroup,
+                action.data.paidExams,
+                action.data.examTakens
             );
             const userIndex = users.findIndex(user => user.id === updatedUser.id);
 
@@ -101,8 +105,9 @@ export default (state = initialState, action) => {
                 action.data.lastname,
                 action.data.othernames,
                 action.data.mobile,
-                action.data.userGroup
-            );
+                action.data.userGroup,
+                action.data.paidExams,
+                action.data.examTakens            );
             const userActivatedIndex = existingUsers.findIndex(user => user.id === activatedUser.id);
 
             existingUsers[userActivatedIndex] = activatedUser;

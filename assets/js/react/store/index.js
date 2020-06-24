@@ -12,6 +12,8 @@ import examTypesReducer from './reducers/exam-types';
 import examsReducer from './reducers/exams';
 import questionTypesReducer from './reducers/question-types';
 import questionsReducer from './reducers/questions';
+import userQuestionsReducer from './reducers/user-exam-questions';
+import examsTakenReducer from './reducers/exams-taken';
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -24,7 +26,9 @@ const rootReducer = combineReducers({
     examTypes: examTypesReducer,
     exams: examsReducer,
     questionTypes: questionTypesReducer,
-    questions: questionsReducer
+    questions: questionsReducer,
+    userQuestions: userQuestionsReducer,
+    examsTaken: examsTakenReducer
 });
 
 export const store = createStore(

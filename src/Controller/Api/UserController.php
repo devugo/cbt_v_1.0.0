@@ -183,18 +183,45 @@ class UserController extends AbstractController
             return $response;
         }
 
-        if($user !== $this->getUser() && !can_resource($this->getUser(), 'update', 'users')){
 
-            $response = new JsonResponse([
-                'errors' => $serializer->serialize('Access denied', 'jsonld')
-            ], 403);
-            
-            $api_audit_trail->setResponseData((array) $response);
-            $entityManager->persist($api_audit_trail);
-            $entityManager->flush();
-            
-            return $response;
+        if(count($this->getUser()->getRoles()) === 1){
+            if($user !== $this->getUser()){
+                $response = new JsonResponse([
+                    'errors' => $serializer->serialize('Access denied', 'jsonld')
+                ], 403);
+                
+                $api_audit_trail->setResponseData((array) $response);
+                $entityManager->persist($api_audit_trail);
+                $entityManager->flush();
+                
+                return $response;
+            }
+        }else{
+            if(!can_resource($this->getUser(), 'update', 'users')){
+                $response = new JsonResponse([
+                    'errors' => $serializer->serialize('Access denied', 'jsonld')
+                ], 403);
+                
+                $api_audit_trail->setResponseData((array) $response);
+                $entityManager->persist($api_audit_trail);
+                $entityManager->flush();
+                
+                return $response;
+            }
         }
+
+        // if($user !== $this->getUser() && !can_resource($this->getUser(), 'update', 'users')){
+
+        //     $response = new JsonResponse([
+        //         'errors' => $serializer->serialize('Access denied', 'jsonld')
+        //     ], 403);
+            
+        //     $api_audit_trail->setResponseData((array) $response);
+        //     $entityManager->persist($api_audit_trail);
+        //     $entityManager->flush();
+            
+        //     return $response;
+        // }
 
         /** @var UploadedFile $uploadedFile */
         $uploadedFile = $request->files->get('image');
@@ -203,7 +230,7 @@ class UserController extends AbstractController
             $user->setPhoto($newFilename);
         }
         
-        $userGroup = $iriConverter->getItemFromIri($request->get('userGroup'));
+        // $userGroup = $iriConverter->getItemFromIri($request->get('userGroup'));
        
         /** @var User $user */
         $user->setFirstname($request->get('firstname'))
@@ -213,7 +240,7 @@ class UserController extends AbstractController
             ->setSex($request->get('sex'))
             ->setUsername($request->get('username'))
             ->setEmail($request->get('email'))
-            ->setUserGroup($userGroup)
+            // ->setUserGroup($userGroup)
             ->setUpdatedAt(new \DateTimeImmutable())
         ;
         

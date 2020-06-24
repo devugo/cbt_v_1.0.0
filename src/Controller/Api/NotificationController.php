@@ -301,6 +301,32 @@ class NotificationController extends AbstractController
             
             return $response;
         }
+
+        if(count($this->getUser()->getRoles()) === 1){
+            if($this->getUser() == $notification->getSentTo()){
+                if($notification->getSeenAt() == NULL){
+                    $notification->setSeenAt(new \DateTimeImmutable());
+                }
+                $notification->setUpdatedAt(new \DateTimeImmutable());
+                $entityManager->persist($notification);
+                $entityManager->flush();
+        
+                return new JsonResponse([
+                    'notification' => $serializer->serialize($notification, 'jsonld')
+        
+                ], 201);
+            }else {
+                $response = new JsonResponse([
+                    'errors' => $serializer->serialize('Access denied', 'jsonld')
+                ], 403);
+                
+                $api_audit_trail->setResponseData((array) $response);
+                $entityManager->persist($api_audit_trail);
+                $entityManager->flush();
+                
+                return $response;
+            }
+        }
         
         if(!can_resource($this->getUser(), 'update', 'notifications')){
 

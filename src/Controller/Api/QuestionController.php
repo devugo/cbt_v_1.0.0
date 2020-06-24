@@ -109,6 +109,13 @@ class QuestionController extends AbstractController
             $question->setExplanationResource($newFilename);
         }
 
+        /** @var UploadedFile $uploadedFile */
+        $uploadedFile = $request->files->get('image');
+        if($uploadedFile){
+            $newFilename = $uploaderHelper->uploadQuestionImage($uploadedFile, null);
+            $question->setImage($newFilename);
+        }
+
         $questionType = $iriConverter->getItemFromIri($request->get('questionType'));
         $subject = $iriConverter->getItemFromIri($request->get('subject'));
         $level = $iriConverter->getItemFromIri($request->get('level'));
@@ -233,6 +240,13 @@ class QuestionController extends AbstractController
         if($uploadedFile){
             $newFilename = $uploaderHelper->uploadExplanationResource($uploadedFile, $question->getExplanationResource());
             $question->setExplanationResource($newFilename);
+        }
+
+        /** @var UploadedFile $uploadedFile */
+        $uploadedFile = $request->files->get('image');
+        if($uploadedFile){
+            $newFilename = $uploaderHelper->uploadQuestionImage($uploadedFile, $question->getImage());
+            $question->setImage($newFilename);
         }
 
         $questionType = $iriConverter->getItemFromIri($request->get('questionType'));

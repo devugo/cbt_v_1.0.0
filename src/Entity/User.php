@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -46,6 +47,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *  }
  * )
  * @ApiFilter(BooleanFilter::class, properties={"isActive", "isAdmin", "isModerator", "isTaker", "isDeleted"})
+ * @ApiFilter(SearchFilter::class, properties={"userGroup":"exact"})
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"username"})
  * @ORM\Table(name="users")
@@ -327,6 +329,28 @@ class User implements UserInterface
      */
     private $userGroup;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserExamQuestions", mappedBy="user")
+     */
+    private $userExamQuestions;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ExamTaken", mappedBy="user")
+     * @Groups({"user:read"})
+     */
+    private $examTakens;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\PaidExam", mappedBy="user")
+     * @Groups({"user:read"})
+     */
+    private $paidExams;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\PaidExam", mappedBy="approvedBy")
+     */
+    private $approvedPaidExams;
+
     
     public function __construct()
     {
@@ -343,6 +367,10 @@ class User implements UserInterface
         $this->examsCreated = new ArrayCollection();
         $this->createdAccountTypes = new ArrayCollection();
         $this->apiAuditTrails = new ArrayCollection();
+        $this->userExamQuestions = new ArrayCollection();
+        $this->examTakens = new ArrayCollection();
+        $this->paidExams = new ArrayCollection();
+        $this->approvedPaidExams = new ArrayCollection();
     }
 
 
@@ -1038,6 +1066,130 @@ class User implements UserInterface
     public function setUserGroup(?UserGroup $userGroup): self
     {
         $this->userGroup = $userGroup;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserExamQuestions[]
+     */
+    public function getUserExamQuestions(): Collection
+    {
+        return $this->userExamQuestions;
+    }
+
+    public function addUserExamQuestion(UserExamQuestions $userExamQuestion): self
+    {
+        if (!$this->userExamQuestions->contains($userExamQuestion)) {
+            $this->userExamQuestions[] = $userExamQuestion;
+            $userExamQuestion->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserExamQuestion(UserExamQuestions $userExamQuestion): self
+    {
+        if ($this->userExamQuestions->contains($userExamQuestion)) {
+            $this->userExamQuestions->removeElement($userExamQuestion);
+            // set the owning side to null (unless already changed)
+            if ($userExamQuestion->getUser() === $this) {
+                $userExamQuestion->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ExamTaken[]
+     */
+    public function getExamTakens(): Collection
+    {
+        return $this->examTakens;
+    }
+
+    public function addExamTaken(ExamTaken $examTaken): self
+    {
+        if (!$this->examTakens->contains($examTaken)) {
+            $this->examTakens[] = $examTaken;
+            $examTaken->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExamTaken(ExamTaken $examTaken): self
+    {
+        if ($this->examTakens->contains($examTaken)) {
+            $this->examTakens->removeElement($examTaken);
+            // set the owning side to null (unless already changed)
+            if ($examTaken->getUser() === $this) {
+                $examTaken->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PaidExam[]
+     */
+    public function getPaidExams(): Collection
+    {
+        return $this->paidExams;
+    }
+
+    public function addPaidExam(PaidExam $paidExam): self
+    {
+        if (!$this->paidExams->contains($paidExam)) {
+            $this->paidExams[] = $paidExam;
+            $paidExam->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaidExam(PaidExam $paidExam): self
+    {
+        if ($this->paidExams->contains($paidExam)) {
+            $this->paidExams->removeElement($paidExam);
+            // set the owning side to null (unless already changed)
+            if ($paidExam->getUser() === $this) {
+                $paidExam->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PaidExam[]
+     */
+    public function getApprovedPaidExams(): Collection
+    {
+        return $this->approvedPaidExams;
+    }
+
+    public function addApprovedPaidExam(PaidExam $approvedPaidExam): self
+    {
+        if (!$this->approvedPaidExams->contains($approvedPaidExam)) {
+            $this->approvedPaidExams[] = $approvedPaidExam;
+            $approvedPaidExam->setApprovedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApprovedPaidExam(PaidExam $approvedPaidExam): self
+    {
+        if ($this->approvedPaidExams->contains($approvedPaidExam)) {
+            $this->approvedPaidExams->removeElement($approvedPaidExam);
+            // set the owning side to null (unless already changed)
+            if ($approvedPaidExam->getApprovedBy() === $this) {
+                $approvedPaidExam->setApprovedBy(null);
+            }
+        }
 
         return $this;
     }

@@ -682,7 +682,7 @@ const AccountTypes = () => {
                         <h3 className="title-5 m-b-35">Account Types</h3>
                         {
                             loading.content ?
-                            <div className="text-center"><LoadingOutlined style={{color: 'blue'}} /></div> :
+                            <div className="text-center"><LoadingOutlined style={{color: 'blue', fontSize: 50}} /></div> :
                             <div className="table-responsive">
                                 <table className="table table-data2">
                                     <thead>

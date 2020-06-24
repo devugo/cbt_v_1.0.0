@@ -6,7 +6,5 @@ export const getBase64 = (file) => {
         
     }
     reader.readAsDataURL(file);
-
-    console.log(base64_img);
     return base64_img;
 }

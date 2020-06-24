@@ -4,18 +4,22 @@ namespace App\Entity;
 
 use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ApiResource(
  *  normalizationContext={"groups"={"notification:read"}},
  *  denormalizationContext={"groups"={"notification:write"}},
  *  attributes={
- *      "pagination_items_per_page"=10
+ *      "pagination_items_per_page"=10,
+ *      "order"={"id": "DESC"}
  *  }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"sentBy":"exact", "sentTo":"exact"})
  * @ORM\Table(name="notifications")
  * @ORM\Entity(repositoryClass="App\Repository\NotificationRepository")
  */

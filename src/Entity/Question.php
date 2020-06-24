@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Carbon\Carbon;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -17,7 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *      "pagination_items_per_page"=10
  *  }
  * )
- * @ApiFilter(SearchFilter::class, properties={"questionType":"exact"})
+ * @ApiFilter(SearchFilter::class, properties={"questionType":"exact", "level":"exact", "subject":"exact"})
  * @ORM\Table(name="questions")
  * @ORM\Entity(repositoryClass="App\Repository\QuestionRepository")
  */
@@ -107,10 +109,29 @@ class Question
      */
     private $updatedAt;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Exam", mappedBy="questions")
+     * @Groups({"question:read", "question:write"})
+     */
+    private $exams;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserExamQuestions", mappedBy="question")
+     */
+    private $userExamQuestions;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups({"question:read", "question:write"})
+     */
+    private $image;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->exams = new ArrayCollection();
+        $this->userExamQuestions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -278,6 +299,77 @@ class Question
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Exam[]
+     */
+    public function getExams(): Collection
+    {
+        return $this->exams;
+    }
+
+    public function addExam(Exam $exam): self
+    {
+        if (!$this->exams->contains($exam)) {
+            $this->exams[] = $exam;
+            $exam->addQuestion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExam(Exam $exam): self
+    {
+        if ($this->exams->contains($exam)) {
+            $this->exams->removeElement($exam);
+            $exam->removeQuestion($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserExamQuestions[]
+     */
+    public function getUserExamQuestions(): Collection
+    {
+        return $this->userExamQuestions;
+    }
+
+    public function addUserExamQuestion(UserExamQuestions $userExamQuestion): self
+    {
+        if (!$this->userExamQuestions->contains($userExamQuestion)) {
+            $this->userExamQuestions[] = $userExamQuestion;
+            $userExamQuestion->setQuestion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserExamQuestion(UserExamQuestions $userExamQuestion): self
+    {
+        if ($this->userExamQuestions->contains($userExamQuestion)) {
+            $this->userExamQuestions->removeElement($userExamQuestion);
+            // set the owning side to null (unless already changed)
+            if ($userExamQuestion->getQuestion() === $this) {
+                $userExamQuestion->setQuestion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

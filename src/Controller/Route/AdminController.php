@@ -2,6 +2,15 @@
 
 namespace App\Controller\Route;
 
+use App\Repository\ExamRepository;
+use App\Repository\UserRepository;
+use App\Repository\LevelRepository;
+use App\Repository\SubjectRepository;
+use App\Repository\QuestionRepository;
+use App\Repository\ExamTakenRepository;
+use App\Repository\UserGroupRepository;
+use App\Repository\AccountTypeRepository;
+use App\Repository\NotificationRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -10,10 +19,32 @@ class AdminController extends AbstractController
     /**
      * @Route("/admin", name="admin_dashboard")
      */
-    public function index()
+    public function index(UserRepository $userRepository, ExamTakenRepository $examTakenRepository, UserGroupRepository $userGroupRepository, SubjectRepository $subjectRepository, LevelRepository $levelRepository, QuestionRepository $questionRepository, ExamRepository $examRepository, AccountTypeRepository $accountTypeRepository, NotificationRepository $notificationRepository)
     {
+        $users = $userRepository->findAllDesc();
+        $examsTaken = $examTakenRepository->findAllDesc();
+        $userGroups = $userGroupRepository->findAll();
+        $subjects = $subjectRepository->findAll();
+        $levels = $levelRepository->findAll();
+        $questions = $questionRepository->findAll();
+        $exams = $examRepository->findAll();
+        $accountTypes = $accountTypeRepository->findAll();
+        $notifications = $notificationRepository->findAll();
+        $usersFive = $userRepository->recentFive();
+        $examsTakenFive = $examTakenRepository->recentFive();
+        
         return $this->render('admin/pages/index.html.twig', [
-            'controller_name' => 'AdminController',
+            'users' => $users,
+            'exams_taken' => $examsTaken,
+            'user_groups' => $userGroups,
+            'subjects' => $subjects,
+            'levels' => $levels,
+            'questions' => $questions,
+            'exams' => $exams,
+            'account_types' => $accountTypes,
+            'notifications' => $notifications,
+            'users_five' => $usersFive,
+            'exams_taken_five' => $examsTakenFive
         ]);
     }
 
@@ -79,6 +110,14 @@ class AdminController extends AbstractController
     public function notifications()
     {
         return $this->render('admin/pages/notifications.html.twig');
+    }
+
+    /**
+     * @Route("/admin/results", name="admin_results")
+     */
+    public function results()
+    {
+        return $this->render('admin/pages/results.html.twig');
     }
 
     /**

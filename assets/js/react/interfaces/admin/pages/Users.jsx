@@ -39,6 +39,10 @@ const emptyFormData = {
     userGroup: ''
 };
 
+const emptySortData = {
+    userGroup: ''
+};
+
 const clearErrors = {
     title: '',
     description: '',
@@ -84,6 +88,7 @@ const Users = () => {
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
     const [formData, setFormData] = useState(emptyFormData);
+    const [sortData, setSortData] = useState(emptySortData);
     const [loading, setLoading] = useState(loaders);
     const [imgUrl, setImgUrl] = useState();
     const [filterMe, setFilterMe] = useState("");
@@ -155,6 +160,13 @@ const Users = () => {
         fileInp.current.click();
     }, []);
 
+    const onChangeSortUserGroup = useCallback((value) => {
+        setSortData({
+            ...sortData,
+            userGroup: value
+        });
+    }, [sortData, setSortData]);
+
     const changeFormData = useCallback((e) => {
         if(e.target.name == 'image') {
             setLoading({
@@ -216,8 +228,6 @@ const Users = () => {
 
     const getSingleUser = useCallback((val, data) => {
         let user = data.find(user => user.id === val);
-
-        console.log(user);
 
         setFormData({
             ...formData,
@@ -412,7 +422,7 @@ const Users = () => {
         });
     }, [formData, dispatch, setLoading, loading, setErrors, errors, setFormData, setImgUrl]);
 
-    const getUsers = useCallback(async (page = 1) => {
+    const getUsers = useCallback(async (page = 1, pagination = true, userGroup = sortData.userGroup) => {
         // setFilteredUsers(); setUsers(); 
         setLoading({
             ...loading,
@@ -420,7 +430,7 @@ const Users = () => {
         });
 
         try {
-            await dispatch(UsersActions.read(page));
+            await dispatch(UsersActions.read(page, pagination, userGroup));
         } catch(error) {
             Notification("error", "Connection Error", "There was an error connecting. Try back later!", 0)
             setErrors(clearErrors);
@@ -429,7 +439,7 @@ const Users = () => {
             ...loading,
             content: false
         });
-    }, [dispatch, setLoading, loading, setErrors, Notification]);
+    }, [dispatch, setLoading, loading, setErrors, Notification, sortData]);
 
     const getAccountTypes = useCallback(async (page = 1, pagination = false) => {
 
@@ -471,10 +481,10 @@ const Users = () => {
     
     const renderTableData = () => {
         if (!filteredUsers){
-            return <tr className="text-center"><td colSpan={9}><Spin /></td></tr>
+            return <tr className="text-center"><td colSpan={10}><Spin /></td></tr>
         }
         if(filteredUsers.length === 0){
-            return <tr className="text-center"><td colSpan={9}><strong><i>No record found!</i></strong></td></tr>
+            return <tr className="text-center"><td colSpan={10}><strong><i>No record found!</i></strong></td></tr>
         }
         return filteredUsers.map((user, index) => {
             let checker = isChecked(user.iri);
@@ -496,6 +506,7 @@ const Users = () => {
                         <td>{user.name}</td>
                         <td><span className="block-email">{user.email}</span></td>
                         <td>{user.sex}</td>
+                        <td>{userGroups && userGroups.length > 0 && (userGroups.find(grp => grp.iri === user.userGroup["@id"])).title}</td>
                         <td><Tag color="cyan">{user.createdAtAgo}</Tag></td>
                         <td>
                             {
@@ -533,16 +544,17 @@ const Users = () => {
     }
 
     useEffect(() => {
-        getUsers();
         getAccountTypes();
         getUserGroups();
     }, []);
 
     useEffect(() => {
+        getUsers()
+    }, [sortData]);
+
+    useEffect(() => {
         setFilteredUsers(users);
     }, [users]);
-
-    console.log(formData);
 
     return (
         <>
@@ -556,10 +568,36 @@ const Users = () => {
                         <h3 className="title-5 m-b-35">Users</h3>
                         {
                             loading.content ?
-                            <div className="text-center"><LoadingOutlined style={{color: 'blue'}} /></div> :
+                            <div className="text-center"><LoadingOutlined style={{color: 'blue', fontSize: 50}} /></div> :
                             <>
-                                <div className="col-lg-3 col-md-4">
-                                    <Input placeholder="Search user..." allowClear value={filterMe} onChange={changeFilteredMe} />
+                                <div className="row">
+                                    <div className="col-lg-1 col-md-1">
+                                        Filter: 
+                                    </div>
+                                    <div className="col-lg-8 col-md-8">
+                                        <div style={{width: '100%', display: 'flex'}}>
+                                            <div style={{width: '33%'}}>
+                                                <Select
+                                                    showSearch
+                                                    style={{width: 200}}
+                                                    placeholder="Filter by group"
+                                                    optionFilterProp="children"
+                                                    onChange={onChangeSortUserGroup}
+                                                    value={sortData.userGroup}
+                                                >
+                                                    <Select.Option value="">All Groups</Select.Option>
+                                                    {
+                                                        userGroups && userGroups.length > 0 && userGroups.map((userGrp, index) => <Select.Option key={index} value={userGrp.iri}>{userGrp.title}</Select.Option>)
+                                                    }
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br />
+                                <div className="row">
+                                    <div className="col-lg-3 col-md-4">
+                                        <Input placeholder="Search user..." allowClear value={filterMe} onChange={changeFilteredMe} />
+                                    </div>
                                 </div>
                                 <div className="table-responsive table-responsive-data2">
                                     <table className="table table-data2">
@@ -567,7 +605,7 @@ const Users = () => {
                                             {
                                                 values.length > 0 &&
                                                 <tr>
-                                                    <th colSpan={8}><i>{values.length} item(s) selected</i></th>
+                                                    <th colSpan={9}><i>{values.length} item(s) selected</i></th>
                                                     <th>
                                                         {
                                                         loading.action ? 
@@ -597,6 +635,7 @@ const Users = () => {
                                                 <th>Name</th>
                                                 <th>Email</th>
                                                 <th>Sex</th>
+                                                <th>Group</th>
                                                 <th>Created</th>
                                                 <th>Status</th>
                                                 <th>Action</th>

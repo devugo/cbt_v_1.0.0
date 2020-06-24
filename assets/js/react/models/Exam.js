@@ -1,5 +1,5 @@
 class Exam {
-    constructor(id, iri, title, description, startFrom, endAfter, duration, maximumAttempts, percentagePassMark, correctAnswerScore, wrongAnswerScore, allowedIpAddresses, viewAnswersAfterSubmitting, openQuiz, showResultPosition, addQuestions, price, generateCertificate, certificateText, createdAtAgo, updatedAtAgo, status, userGroup, examType, startTime, endTime){
+    constructor(id, iri, title, description, startFrom, endAfter, duration, maximumAttempts, percentagePassMark, correctAnswerScore, wrongAnswerScore, allowedIpAddresses, viewAnswersAfterSubmitting, openQuiz, showResultPosition, addQuestions, price, generateCertificate, certificateText, createdAtAgo, updatedAtAgo, status, userGroup, examType, startTime, endTime, questions, shuffleQuestions, shuffleOptions){
         this.id = id;
         this.iri = iri;
         this.title = title;
@@ -26,7 +26,9 @@ class Exam {
         this.examType = examType;
         this.startTime = startTime;
         this.endTime = endTime;
-
+        this.questions = questions;
+        this.shuffleQuestions = shuffleQuestions;
+        this.shuffleOptions = shuffleOptions;
     }
 }
 

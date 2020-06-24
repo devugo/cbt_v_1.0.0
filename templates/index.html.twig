@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ parent() }}
+    {# <script>
+        window.user = {{ user|raw }}
+    </script> #}
+    {# {{ include( 'layout/_navbar.html.twig' ) }} #}
+    <div id="app-details" class="app-details"  style="background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)), url('../images/background/login-register.jpg') !important;">
+        <div class="app-details__body">
+            <div class="app-details__title">
+                <h4>DEVUGO CBT APPLICATION</h4>
+            </div>
+            <div class="app-details__content">
+                <div class="app-details__content-super">
+                    <h4>Admin login details</h4>
+                    <p><strong>Url:</strong> <a href="http://cbt.devugo.com/login" target="_blank">cbt.devugo.com/login</a></p>
+                    <p><strong>Email:</strong> info@devugo.com</p>
+                    <p><strong>Password:</strong> password</p>
+                </div><br /><br />
+                <div class="app-details__content-admin">
+                    <h4>Student login details:</h4>
+                    <p><strong>Url:</strong> <a href="http://cbt.devugo.com/login" target="_blank">cbt.devugo.com/login</a></p>
+                    <p><strong>Email:</strong> nne@gmail.com</p>
+                    <p><strong>Password:</strong> 123456</p>
+                </div>
+            <div>
+        </div>
+    </div>
+{% endblock %}

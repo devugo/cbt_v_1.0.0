@@ -1,4 +1,4 @@
-import { READ_EXAMS, CREATE_EXAM, DELETE_EXAM, ACTIVATE_EXAM, UPDATE_EXAM } from '../actions/exams';
+import { READ_EXAMS, CREATE_EXAM, DELETE_EXAM, ACTIVATE_EXAM, UPDATE_EXAM, GENERATE_QUESTIONS_TO_EXAM } from '../actions/exams';
 import Exam from '../../models/Exam';
 import { ITEMSPERPAGE } from '../../ENV';
 
@@ -41,7 +41,10 @@ export default (state = initialState, action) => {
                 action.data.groups[0],
                 action.data.examType,
                 action.data.startTime,
-                action.data.endTime
+                action.data.endTime,
+                action.data.questions.length,
+                action.data.shuffleQuestions,
+                action.data.shuffleOptions
             );
             return {
                 ...state,
@@ -80,10 +83,13 @@ export default (state = initialState, action) => {
                 action.data.createdAtAgo,
                 action.data.updatedAtAgo,
                 action.data.isActive,
-                action.data.groups[0],
+                action.data.groups[1],
                 action.data.examType,
                 action.data.startTime,
-                action.data.endTime
+                action.data.endTime,
+                action.data.questions.length,
+                action.data.shuffleQuestions,
+                action.data.shuffleOptions
             );
             const examIndex = exams.findIndex(exam => exam.id === updatedExam.id);
 
@@ -121,7 +127,10 @@ export default (state = initialState, action) => {
                 action.data.groups[0],
                 action.data.examType,
                 action.data.startTime,
-                action.data.endTime
+                action.data.endTime,
+                action.data.questions.length,
+                action.data.shuffleQuestions,
+                action.data.shuffleOptions
             );
             const examActivatedIndex = existingExams.findIndex(exam => exam.id === activatedExam.id);
 
@@ -130,6 +139,47 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 data: existingExams
+            }
+        case GENERATE_QUESTIONS_TO_EXAM:
+            const oldExams = state.data;
+            const updatedExamWithQues = new Exam(
+                action.data.id, 
+                action.data['@id'],
+                action.data.title, 
+                action.data.description, 
+                action.data.startFrom,
+                action.data.endAfter,
+                action.data.duration,
+                action.data.maximumAttempts,
+                action.data.percentagePassMark,
+                action.data.correctAnswerScore,
+                action.data.wrongAnswerScore,
+                action.data.allowedIpAddresses,
+                action.data.viewAnswersAfterSubmitting,
+                action.data.openQuiz,
+                action.data.showResultPosition,
+                action.data.addQuestions,
+                action.data.price,
+                action.data.generateCertificate,
+                action.data.certificateText,
+                action.data.createdAtAgo,
+                action.data.updatedAtAgo,
+                action.data.isActive,
+                action.data.groups[0],
+                action.data.examType,
+                action.data.startTime,
+                action.data.endTime,
+                action.data.questions.length,
+                action.data.shuffleQuestions,
+                action.data.shuffleOptions
+            );
+            const examUpdatedIndex = oldExams.findIndex(exam => exam.id === updatedExamWithQues.id);
+
+            oldExams[examUpdatedIndex] = updatedExamWithQues;
+    
+            return {
+                ...state,
+                data: oldExams
             }
     }
     return state;

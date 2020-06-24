@@ -23,8 +23,12 @@ const Breadcrumb = props => {
                                             <li className="list-inline-item">{pageTitle}</li>
                                         </ul>
                                     </div>
-                                    <button className="au-btn au-btn-icon au-btn--green" onClick={addResource}>
+                                    {
+                                        addResource &&
+                                        <button className="au-btn au-btn-icon au-btn--green" onClick={addResource}>
                                         <i className="zmdi zmdi-plus"></i>add item</button>
+                                    }
+                                   
                                 </div>
                             </div>
                         </div>

@@ -19,6 +19,7 @@ class UploaderHelper
 {
     const USER_AVATARS = 'user_avatars';
     const EXPLANATION_RESOURCES = 'explanation_resources';
+    const QUESTION_IMAGES = 'question_images';
 
     private $uploadsPath;
     private $filesystem;
@@ -71,6 +72,26 @@ class UploaderHelper
 
         if($existingFilename) {
             $this->delete_image_from_storage($existingFilename, self::EXPLANATION_RESOURCES);
+            
+        }
+
+        return $newFilename;
+    }
+
+    public function uploadQuestionImage(UploadedFile $uploadedFile, ?string $existingFilename): string
+    {
+        $destination = $this->uploadsPath.'/'.self::QUESTION_IMAGES;
+
+        $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME); // original client name without file extension
+        $newFilename = Urlizer::urlize($originalFilename).'-'.uniqid().'.'.$uploadedFile->guessExtension();
+
+        $uploadedFile->move(
+            $destination,
+            $newFilename
+        );
+
+        if($existingFilename) {
+            $this->delete_image_from_storage($existingFilename, self::QUESTION_IMAGES);
             
         }
 

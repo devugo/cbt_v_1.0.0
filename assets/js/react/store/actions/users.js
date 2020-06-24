@@ -33,13 +33,13 @@ export const create = (form) => {
     }
 }
 
-export const read = (page = 1, pagination = true) => {
+export const read = (page = 1, pagination = true, userGroup = null) => {
     return async (dispatch, getState) => {
         // console.log(getState());
         try {
             const response = await axios({
                 method: 'GET',
-                url: `${ENV.HOST}/api/users?page=${page}&pagination=${pagination}`,
+                url: `${ENV.HOST}/api/users?userGroup=${userGroup}&page=${page}&pagination=${pagination}`,
                 headers: ENV.HEADERS
             });
             if(response.status != 200){
@@ -48,7 +48,7 @@ export const read = (page = 1, pagination = true) => {
             const resData = await response.data['hydra:member'];
             const totalData = await response.data['hydra:totalItems'];
 
-            let usersData = resData.map(user => new User(user.id, user['@id'], user.photo, `${user.lastname} ${user.firstname} ${user.othernames}`, user.email, user.username, user.dob, user.sex, user.accountType, user.createdAtAgo, user.updatedAtAgo, user.isActive, user.firstname, user.lastname, user.othernames, user.mobile, user.userGroup));
+            let usersData = resData.map(user => new User(user.id, user['@id'], user.photo, `${user.lastname} ${user.firstname} ${user.othernames}`, user.email, user.username, user.dob, user.sex, user.accountType, user.createdAtAgo, user.updatedAtAgo, user.isActive, user.firstname, user.lastname, user.othernames, user.mobile, user.userGroup, user.paidExams, user.examTakens));
 
             dispatch({
                 type: READ_USERS,
@@ -145,7 +145,7 @@ export const auth = (iri = null) => {
             const resData = await response;
             const user = resData.data;
 
-            let userData  = new User(user.id, user['@id'], user.photo, `${user.lastname} ${user.firstname} ${user.othernames}`, user.email, user.username, user.dob, user.sex, user.accountType, user.createdAtAgo, user.updatedAtAgo, user.isActive, user.firstname, user.lastname, user.othernames, user.mobile, user.userGroup);
+            let userData  = new User(user.id, user['@id'], user.photo, `${user.lastname} ${user.firstname} ${user.othernames}`, user.email, user.username, user.dob, user.sex, user.accountType, user.createdAtAgo, user.updatedAtAgo, user.isActive, user.firstname, user.lastname, user.othernames, user.mobile, user.userGroup, user.paidExams, user.examTakens);
 
             dispatch({
                 type: GET_AUTH_USER,

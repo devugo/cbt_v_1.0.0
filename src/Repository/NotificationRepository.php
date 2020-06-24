@@ -19,6 +19,29 @@ class NotificationRepository extends ServiceEntityRepository
         parent::__construct($registry, Notification::class);
     }
 
+    public function userRecentThree($user)
+    {
+        return $this->createQueryBuilder('n')
+            ->andWhere('n.sentTo = :user')
+            ->setParameter('user', $user)
+            ->orderBy('n.id', 'DESC')
+            ->setMaxResults(3)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function userUnread($user)
+    {
+        return $this->createQueryBuilder('n')
+            ->andWhere('n.sentTo = :user')
+            ->andWhere('n.seenAt is null')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     // /**
     //  * @return Notification[] Returns an array of Notification objects
     //  */

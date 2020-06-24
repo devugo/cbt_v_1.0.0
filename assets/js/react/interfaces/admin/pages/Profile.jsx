@@ -521,7 +521,7 @@ const Profile = () => {
                                                         </div>
                                                         <div className="col-lg-4 col-md-4">
                                                             <div className="form-group">
-                                                                <label htmlFor="newPassword">newPassword</label>
+                                                                <label htmlFor="newPassword">New Password</label>
                                                                 <TextInput name="newPassword" id="newPassword" required
                                                                     type="password"
                                                                     value={formData.newPassword}

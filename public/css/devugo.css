@@ -1,0 +1,77 @@
+body {
+    /* height: 100%; */
+}
+.app-details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.app-details__body {
+    width: 95%;
+    height: 80%;
+    background-color: #f3f3f3;
+}
+
+.app-details__body p {
+    /* margin-top: -30px;
+    margin-bottom: 5px; */
+}
+
+.app-details__title {
+    text-align: center;
+    background-color: navy;
+    color: white;
+    padding: 10px 0;
+    margin-bottom: 15px;
+}
+
+.app-details__title h4 {
+    color: white;
+}
+
+.app-details__content {
+    display: flex;
+    flex-direction: column;
+    padding: 0 10px 10px 10px;
+}
+
+.app-details__button {
+    text-align: center;
+    margin: 60px 0 15px 0;
+} 
+
+.app-details__button a {
+    padding: 10px 20px;
+    color: white;
+    background-color: navy;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.app-details__button a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.app-details__button a:visited {
+    color: white;
+    text-decoration: none;
+}
+
+@media (min-width: 900px) {
+    .app-details__body {
+        width: 50%;
+        height: 75%;
+    }
+    .app-details__content {
+        padding: 10px 20px 20px 20px;
+    }
+}
+
+@media(min-width: 1350px){
+    /* .app-details__button {
+        margin-bottom: -1000px;
+    }  */
+}

@@ -401,10 +401,12 @@ const UserGroups = () => {
                         <h3 className="title-5 m-b-35">User Groups</h3>
                         {
                             loading.content ?
-                            <div className="text-center"><LoadingOutlined style={{color: 'blue'}} /></div> :
+                            <div className="text-center"><LoadingOutlined style={{color: 'blue', fontSize: 50}} /></div> :
                             <>
-                                <div className="col-lg-3 col-md-4">
-                                    <Input placeholder="Search user group..." allowClear value={filterMe} onChange={changeFilteredMe} />
+                                <div className="row">
+                                    <div className="col-lg-3 col-md-4">
+                                        <Input placeholder="Search user group..." allowClear value={filterMe} onChange={changeFilteredMe} />
+                                    </div>
                                 </div>
                                 <div className="table-responsive table-responsive-data2">
                                     <table className="table table-data2">
